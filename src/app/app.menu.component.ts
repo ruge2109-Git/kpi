@@ -23,8 +23,8 @@ export class AppMenuComponent implements OnInit {
     constructor(public appMain: AppMainComponent) { }
 
     ngOnInit() {
-        // this.initModelQA();
-        this.initModelProd();
+        this.initModelQA();
+        // this.initModelProd();
     }
 
     initModelQA() {
@@ -32,7 +32,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Home',
                 items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
+                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] }
                 ]
             },
             {

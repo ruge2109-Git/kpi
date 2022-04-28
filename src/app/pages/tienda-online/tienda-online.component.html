@@ -1,99 +1,55 @@
 <p-toast></p-toast>
 <div class="grid">
   <div class="col-12">
-    <div class="card">
+    <div class="card" *ngIf="!archivosCargados">
       <h5>Seleccione los archivos </h5>
       <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event)" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
       </p-fileUpload>
     </div>
 
-    <div class="grid">
-      <div class="col-12 xl:col-8">
+    <!--Indicadores-->
+    <div class="grid mb-3">
+      <div class="col-12 lg:col-4 xl:col-4" *ngFor="let item of listIndicadores">
+        <div class="card mb-0">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-3">{{item.nombre_indicador}}</span>
+              <div class="text-900 font-medium text-xl" *ngIf="item.esMoneda">{{item.valor|currency:'$'}}</div>
+              <div class="text-900 font-medium text-xl" *ngIf="!item.esMoneda">{{item.valor}}</div>
+            </div>
+            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+              <i class="pi {{item.icono}} text-blue-500 text-xl"></i>
+            </div>
+          </div>
+          <span class="text-green-500 font-medium">{{item.resaltado}} </span>
+          <span class="text-500">{{item.descripcion}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" *ngIf="archivosCargados">
+
+      <div class="col-12 xl:col-4">
         <div class="card">
-          <h5>Tabla de datos</h5>
-          <p-table #dt1 [value]="listTiendaOnline" dataKey="id" [rows]="5" [loading]="loading" [rowHover]="true" styleClass="p-datatable-gridlines" [paginator]="true" [globalFilterFields]="['usuario_cliente','usuario_vendedor','descripcion','fecha_transaccion']"
-            currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} entradas" [showCurrentPageReport]="true" responsiveLayout="scroll">
-            <ng-template pTemplate="caption">
-              <div class="flex justify-content-between flex-column sm:flex-row">
-                <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
-                <span class="p-input-icon-left mb-2">
-                            <i class="pi pi-search"></i>
-                            <input pInputText type="text" #filter (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Buscar" class="w-full"/>
-                        </span>
-              </div>
-            </ng-template>
+          <h5>Modificar productos</h5>
+          <p-table #tableProductos [value]="listProductos" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll">
             <ng-template pTemplate="header">
               <tr>
                 <th>
                   <div class="flex justify-content-between align-items-center">
-                    Cliente
-                    <p-columnFilter type="text" field="usuario_cliente" display="menu" placeholder="Buscar por nombre"></p-columnFilter>
+                    Producto
                   </div>
                 </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Vendedor
-                    <p-columnFilter type="text" field="usuario_vendedor" display="menu" placeholder="Search by country"></p-columnFilter>
-                  </div>
-                </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Descripción
-                    <p-columnFilter type="text" field="descripcion" display="menu" placeholder="Search by country"></p-columnFilter>
-                  </div>
-                </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Fecha transacción
-                  </div>
-                </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Hora transacción
-                  </div>
-                </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Saldo
-                  </div>
-                </th>
-                <th>
-                  <div class="flex justify-content-between align-items-center">
-                    Saldo adicional
-                  </div>
-                </th>
-                <th style="width: 8rem">
-                  <div class="flex justify-content-between align-items-center">
-                    Saldo total
-                  </div>
-                </th>
+                <th>Costo</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data>
               <tr>
                 <td style="min-width: 12rem;">
-                  {{data.usuario_cliente}}
+                  {{data.nombre}}
                 </td>
                 <td style="min-width: 12rem;">
-                  {{data.usuario_vendedor}}
-                </td>
-                <td style="min-width: 14rem;">
-                  {{data.descripcion}}
-                </td>
-                <td style="min-width: 10rem;">
-                  {{data.fecha_transaccion.split('T')[0]}}
-                </td>
-                <td style="min-width: 10rem;">
-                  {{data.fecha_transaccion.split('T')[1]}}
-                </td>
-                <td style="min-width: 10rem;">
-                  {{data.saldo | currency:'$':'symbol'}}
-                </td>
-                <td style="min-width: 12rem;">
-                  {{data.saldo_adicional | currency:'$':'symbol'}}
-                </td>
-                <td style="min-width: 12rem; ">
-                  {{data.saldo_total | currency:'$':'symbol'}}
+                  <p-inputNumber mode="decimal" [(ngModel)]="data.costo_unitario"></p-inputNumber>
                 </td>
               </tr>
             </ng-template>
@@ -111,10 +67,119 @@
         </div>
       </div>
 
+      <div class="col-12 xl:col-8">
+        <div class="grid">
+          <div class="col-12">
+            <div class="card">
+              <h5>Recargas realizadas</h5>
+              <p-table #tableRecargas [value]="listRecargas" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="administrador">Administrador
+                      <p-sortIcon field="administrador"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="cliente">Cliente
+                      <p-sortIcon field="cliente"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="valor_recarga">Valor recarga
+                      <p-sortIcon field="valor_recarga"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="fecha_recarga">Fecha
+                      <p-sortIcon field="fecha_recarga"></p-sortIcon>
+                    </th>
+                    <th></th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-data>
+                  <tr>
+                    <td style="min-width: 12rem;">
+                      {{data.administrador}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.cliente}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.valor_recarga | currency:'$'}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.fecha_recarga}}
+                    </td>
+                    <td>
+                      <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="8">Sin registros</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                  <tr>
+                    <td colspan="8">Cargando información, por favor espere</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card">
+          <h5>Detalle recarga</h5>
+          <p-table #tableDetalleRecargas [value]="listDetalleRecargas" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Usuario</th>
+                <th>Valor recarga</th>
+                <th>Valor venta</th>
+                <th>Balance</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data>
+              <tr>
+                <td style="min-width: 12rem;">
+                  {{data.persona}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.total_recarga | currency:'$'}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.total_ventas | currency: '$'}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.balance | currency: '$'}}
+                </td>
+                <td>
+                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona(null, data.persona)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8">Sin registros</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="loadingbody">
+              <tr>
+                <td colspan="8">Cargando información, por favor espere</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+    </div>
+
+    <!--Ventas por producto-->
+    <div class="grid ">
+
       <div class="col-12 xl:col-4">
         <div class="card">
           <h5>Ventas por producto</h5>
-          <p-table #dt2 [value]="listProductosMasVendidos" [rows]="13" [paginator]="true" responsiveLayout="scroll">
+          <p-table #tableVXP [value]="listProductosMasVendidos" dataKey="code" selectionMode="single" [rows]="5" [paginator]="true" responsiveLayout="scroll">
             <ng-template pTemplate="header">
               <tr>
                 <th>
@@ -128,6 +193,7 @@
                     <p-sortIcon field="cantidad"></p-sortIcon>
                   </div>
                 </th>
+                <th></th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data>
@@ -137,6 +203,9 @@
                 </td>
                 <td style="min-width: 12rem;">
                   {{data.cantidad}}
+                </td>
+                <td>
+                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona(data.nombre_producto,null)"></button>
                 </td>
               </tr>
             </ng-template>
@@ -153,22 +222,11 @@
           </p-table>
         </div>
       </div>
-    </div>
 
-    <div class="grid">
-      <div class="col-12 xl:col-6">
+      <div class="col-12 xl:col-8">
         <div class="card">
-          <h5>Compras por persona</h5>
-          <p-table #dt3 [value]="listComprasPorPersona" [rows]="10" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_persona','nombre_producto']">
-            <ng-template pTemplate="caption">
-              <div class="flex justify-content-between flex-column sm:flex-row">
-                <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt3)"></button>
-                <span class="p-input-icon-left mb-2">
-                              <i class="pi pi-search"></i>
-                              <input pInputText type="text" #filter2 (input)="dt3.filterGlobal($event.target.value, 'contains')" placeholder="Buscar" class="w-full"/>
-                          </span>
-              </div>
-            </ng-template>
+          <h5>Ventas por persona y producto</h5>
+          <p-table #tableVentasYProducto [value]="listComprasPorPersona" [rows]="5" [paginator]="true" responsiveLayout="scroll">
             <ng-template pTemplate="header">
               <tr>
                 <th pSortableColumn="nombre_persona">
@@ -189,12 +247,19 @@
                     <p-sortIcon field="cantidad_ventas"></p-sortIcon>
                   </div>
                 </th>
+                <th pSortableColumn="cantidad_ventas">
+                  <div class="flex justify-content-between align-items-center">
+                    Valor unitario
+                    <p-sortIcon field="cantidad_ventas"></p-sortIcon>
+                  </div>
+                </th>
                 <th pSortableColumn="total_vendido">
                   <div class="flex justify-content-between align-items-center">
-                    Cantidad Dinero
+                    Valor total
                     <p-sortIcon field="total_vendido"></p-sortIcon>
                   </div>
                 </th>
+                <th></th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-data>
@@ -209,28 +274,78 @@
                   {{data.cantidad_ventas}}
                 </td>
                 <td style="min-width: 12rem;">
-                  {{data.total_vendido|currency:'$'}}
+                  {{data.valor_unitario|currency:'$'}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.valor_total|currency:'$'}}
+                </td>
+                <td>
+                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona(data)"></button>
                 </td>
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
               <tr>
-                <td colspan="4">Sin registros</td>
+                <td colspan="6">Sin registros</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="loadingbody">
               <tr>
-                <td colspan="4">Cargando información, por favor espere</td>
+                <td colspan="6">Cargando información, por favor espere</td>
               </tr>
             </ng-template>
           </p-table>
         </div>
-
       </div>
-      <div class="col-12 xl:col-6">
+
+    </div>
+
+
+    <div class="grid">
+      <div class="col-12 xl:col-4">
         <div class="card">
-          <h5>Bar Chart</h5>
-          <p-chart type="bar" [data]="barData" [options]="barOptions"></p-chart>
+          <h5>Ventas por persona</h5>
+          <p-table #tableVentasXPersona [value]="listPersonasMasVentas" [rows]="5" [paginator]="true" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>
+                  <div class="flex justify-content-between align-items-center">
+                    Persona
+                  </div>
+                </th>
+                <th pSortableColumn="cantidad">
+                  <div class="">
+                    Cantidad
+                    <p-sortIcon field="cantidad"></p-sortIcon>
+                  </div>
+                </th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data>
+              <tr>
+                <td style="min-width: 12rem;">
+                  {{data.nombre_persona}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.cantidad}}
+                </td>
+                <td>
+                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona(null,data.nombre_persona)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8">Sin registros</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="loadingbody">
+              <tr>
+                <td colspan="8">Cargando información, por favor espere</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </div>
     </div>

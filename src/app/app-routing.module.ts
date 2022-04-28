@@ -37,6 +37,7 @@ import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.compo
                 children: [
                     // {path: '', component: DashboardComponent},
                     {path: '', redirectTo:'tiendaOnline',pathMatch:'full'},
+                    {path: 'dashboard', component:DashboardComponent},
                     {path: 'uikit/formlayout', component: FormLayoutComponent},
                     {path: 'uikit/input', component: InputComponent},
                     {path: 'uikit/floatlabel', component: FloatLabelComponent},
