@@ -23,8 +23,8 @@ export class AppMenuComponent implements OnInit {
     constructor(public appMain: AppMainComponent) { }
 
     ngOnInit() {
-        this.initModelQA();
-        // this.initModelProd();
+        // this.initModelQA();
+        this.initModelProd();
     }
 
     initModelQA() {

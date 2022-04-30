@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+    production: true,
+    urlTiendaOnline:'https://roberto-kpi.herokuapp.com/api'
 };

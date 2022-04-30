@@ -1,15 +1,17 @@
 export interface TiendaOnline {
-    cod_tienda_streaming: number;
+    cod_tienda_streaming?: number;
     fecha_transaccion: string;
     usuario_cliente: string;
     usuario_vendedor: string;
     descripcion: string;
     producto?: string;
     id_transaccion?: string;
-    valor_venta?: number;
+    valor_venta: number;
     saldo: number;
     saldo_adicional: number;
     saldo_total: number;
+    costo_producto?: number;
+    utilidad?: number;
 }
 
 export interface TO_ProductosMasVendidos {
@@ -28,18 +30,21 @@ export interface TO_ComprasPorPersona {
     cantidad_ventas: number;
     valor_unitario: number;
     valor_total: number;
+    costo: number;
+    utilidad: number;
 }
 
 export interface TO_IndicadoresGenerales {
     nombre_indicador: string;
     icono: string;
-    valor: string | number;
+    valor: number;
     descripcion: string;
     resaltado: string;
     esMoneda: boolean;
 }
 
 export interface TO_Producto {
+    cod_producto?: number;
     nombre: string;
     costo_unitario: number;
 }
