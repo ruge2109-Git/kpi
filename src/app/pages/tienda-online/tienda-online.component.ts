@@ -28,10 +28,13 @@ export class TiendaOnlineComponent implements OnInit {
 
     //Totalizados
     comprasPorPersonaTotal: TO_ComprasPorPersona[] = [];
-
+    totalRecargasRealizadas: number = 0;
+    totalRecargas: number = 0;
+    cantProdVendidos: number = 0;
+    totalProdVendidos: number = 0;
+    cantPersVendidos: number = 0;
+    totalPersVendidos: number = 0;
     //Vista
-    loading: boolean = false;
-    cargandoArchivos: boolean = true;
     @ViewChild('tableVXP') tableVXP: Table;
     @ViewChild('tableVentasYProducto') tableVentasYProducto: Table;
     @ViewChild('tableProductos') tableProductos: Table;
@@ -42,16 +45,34 @@ export class TiendaOnlineComponent implements OnInit {
     @ViewChild('tableDetalleVenta') tableDetalleVenta: Table;
 
     @ViewChild('filterProd') filterProd: ElementRef;
-    @ViewChild('filterRecar') filterRecar: ElementRef;
+    // @ViewChild('filterRecar') filterRecar: ElementRef;
     @ViewChild('filterVentasProdPerso') filterVentasProdPerso: ElementRef;
     @ViewChild('filterDetalleVenta') filterDetalleVenta: ElementRef;
-    @ViewChild('filterRecarTota') filterRecarTota: ElementRef;
+    // @ViewChild('filterRecarTota') filterRecarTota: ElementRef;
+    // @ViewChild('filterVentaProducto') filterVentaProducto: ElementRef;
+    @ViewChild('filterVentasPersona') filterVentasPersona: ElementRef;
 
-    //Grafico de barras
-    barOptions: any;
-    barData: any;
 
-    constructor(private messageService: MessageService, private datePipe: DatePipe, private tiendaService: TiendaOnlineService) { }
+    //Filtros
+    rangoFechasRecargas: Date[] = [];
+    rangoFechas: Date[] = [];
+    rangoFechasProductos: Date[] = [];
+    rangoFechasPersona: Date[] = [];
+
+    //Spiners
+    spinIndicadores: boolean;
+    spinProductos: boolean;
+    spinRecargas: boolean;
+    spinRecargasTotalizadas: boolean;
+    spinDetalleRecarga: boolean;
+    spinVentasProducto: boolean;
+    spinTotalizadoVentas: boolean;
+    spinVentaPersonaProducto: boolean;
+    spinVentasPersona: boolean;
+    spinDetalleVenta: boolean;
+
+
+    constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService) { }
 
     ngOnInit(): void {
         this.getProductosDatabase();
@@ -75,7 +96,9 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     getProductosDatabase() {
+        this.spinProductos = true;
         this.tiendaService.getProductos().subscribe((data: any) => {
+            this.spinProductos = false;
             if (!data.bRta) return;
             this.listProductos = data.data.map(element => {
                 return {
@@ -88,17 +111,14 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     getTiendaOnlineDatabase() {
-        this.cargandoArchivos = true;
         this.tiendaService.getTiendaOnline().subscribe((data: any) => {
             if (!data.bRta) return;
             this.listTiendaOnline = data.data;
             this.initData();
-            this.cargandoArchivos = false;
         })
     }
 
     readExcel() {
-        this.loading = true;
         this.uploadedFiles.forEach(element => {
             readXlsxFile(element).then((rows) => {
                 rows.forEach((element: any) => {
@@ -126,16 +146,17 @@ export class TiendaOnlineComponent implements OnInit {
                     }
                 });
                 this.initData();
+                this.getProductos();
             })
         });
-        this.loading = false;
-        this.cargandoArchivos = false;
 
     }
 
     getIndicadores() {
         this.listIndicadores = [];
+        this.spinIndicadores = true;
         this.tiendaService.getIndicadores().subscribe((data: any) => {
+            this.spinIndicadores = false;
             if (!data.bRta) return;
             this.listIndicadores = data.data.map((data) => {
                 return {
@@ -152,81 +173,91 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     getProductosMasVendidos() {
-        // let listaVentas = this.listTiendaOnline.filter((movimiento) => movimiento.descripcion.includes('Venta de Producto'));
-        // listaVentas.forEach(element => {
-        //     if (this.listProductosMasVendidos.length == 0) {
-        //         this.listProductosMasVendidos.push({ nombre_producto: element.producto, cantidad: 1 });
-        //     }
-        //     else {
-        //         let encontrado = false;
-        //         let contadorEncontrado = 0;
-        //         for (let i = 0; i < this.listProductosMasVendidos.length; i++) {
-        //             const masVendidos = this.listProductosMasVendidos[i];
-        //             if (masVendidos.nombre_producto == element.producto) {
-        //                 encontrado = true;
-        //                 contadorEncontrado = i;
-        //             }
-        //         }
-        //         if (!encontrado) {
-        //             this.listProductosMasVendidos.push({ nombre_producto: element.producto, cantidad: 1 });
-        //         }
-        //         else {
-        //             this.listProductosMasVendidos[contadorEncontrado].cantidad = this.listProductosMasVendidos[contadorEncontrado].cantidad + 1;
-        //         }
-        //     }
-        // });
-        // this.listProductosMasVendidos.sort((a, b) => {
-        //     if (a.cantidad < b.cantidad) {
-        //         return 1;
-        //     }
-        //     if (a.cantidad > b.cantidad) {
-        //         return -1;
-        //     }
-        //     return 0;
-        // });
-        // this.clear(this.tableVXP)
+        this.listProductosMasVendidos = [];
+        this.spinVentasProducto = true;
+        this.cantProdVendidos = 0;
+        this.totalProdVendidos = 0;
+        this.tiendaService.getVentasProducto().subscribe((data: any) => {
+            this.spinVentasProducto = false;
+            if (!data.bRta) return;
+            this.listProductosMasVendidos = data.data;
+            this.listProductosMasVendidos.forEach(element => {
+                element.total_venta = Number(element.total_venta);
+                element.cantidad = Number(element.cantidad);
+                this.cantProdVendidos += element.cantidad;
+                this.totalProdVendidos += element.total_venta;
+            });
+        })
+    }
+
+    getProductosMasVendidosFiltro() {
+        let fechaInicial = this.rangoFechasProductos[0] != null ? this.formatDate(this.rangoFechasProductos[0]) : null;
+        let fechaFinal = this.rangoFechasProductos[1] != null ? this.formatDate(this.rangoFechasProductos[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listProductosMasVendidos = [];
+        this.spinVentasProducto = true;
+        this.cantProdVendidos = 0;
+        this.totalProdVendidos = 0;
+        this.tiendaService.getVentasProductoFiltro(fechaInicial,fechaFinal).subscribe((data: any) => {
+            this.spinVentasProducto = false;
+            if (!data.bRta) return;
+            this.listProductosMasVendidos = data.data;
+            this.listProductosMasVendidos.forEach(element => {
+                element.total_venta = Number(element.total_venta);
+                element.cantidad = Number(element.cantidad);
+                this.cantProdVendidos += element.cantidad;
+                this.totalProdVendidos += element.total_venta;
+            });
+        })
     }
 
     getPersonasConMasVentas() {
-        // let listaVentas = this.listTiendaOnline.filter((movimiento) => movimiento.descripcion.includes('Venta de Producto'));
-        // listaVentas.forEach(element => {
-        //     if (this.listPersonasMasVentas.length == 0) {
-        //         this.listPersonasMasVentas.push({ nombre_persona: element.usuario_cliente, cantidad: 1 });
-        //     }
-        //     else {
-        //         let encontrado = false;
-        //         let contadorEncontrado = 0;
-        //         for (let i = 0; i < this.listPersonasMasVentas.length; i++) {
-        //             const masVendidos = this.listPersonasMasVentas[i];
-        //             if (masVendidos.nombre_persona == element.usuario_cliente) {
-        //                 encontrado = true;
-        //                 contadorEncontrado = i;
-        //             }
-        //         }
-        //         if (!encontrado) {
-        //             this.listPersonasMasVentas.push({ nombre_persona: element.usuario_cliente, cantidad: 1 });
-        //         }
-        //         else {
-        //             this.listPersonasMasVentas[contadorEncontrado].cantidad = this.listPersonasMasVentas[contadorEncontrado].cantidad + 1;
-        //         }
-        //     }
-        // });
-        // this.listPersonasMasVentas.sort((a, b) => {
-        //     if (a.cantidad < b.cantidad) {
-        //         return 1;
-        //     }
-        //     if (a.cantidad > b.cantidad) {
-        //         return -1;
-        //     }
-        //     return 0;
-        // });
-        // this.clear(this.tableVentasXPersona)
+        this.listPersonasMasVentas = [];
+        this.spinVentasPersona = true;
+        this.cantPersVendidos = 0;
+        this.totalPersVendidos = 0;
+        this.tiendaService.getVentasPersona().subscribe((data: any) => {
+            this.spinVentasPersona = false;
+            if (!data.bRta) return;
+            this.listPersonasMasVentas = data.data;
+            this.listPersonasMasVentas.forEach((element) => {
+                element.total_venta = Number(element.total_venta);
+                element.cantidad = Number(element.cantidad);
+                this.cantPersVendidos += element.cantidad;
+                this.totalPersVendidos += element.total_venta;
+            })
+        })
     }
 
-    getComprasPorPersona(productoSeleccionado: string, personaSeleccionada: string) {
+    getPersonasConMasVentasFiltro() {
+        let fechaInicial = this.rangoFechasPersona[0] != null ? this.formatDate(this.rangoFechasPersona[0]) : null;
+        let fechaFinal = this.rangoFechasPersona[1] != null ? this.formatDate(this.rangoFechasPersona[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listPersonasMasVentas = [];
+        this.spinVentasPersona = true;
+        this.cantPersVendidos = 0;
+        this.totalPersVendidos = 0;
+        this.tiendaService.getVentasPersonaFiltro(fechaInicial,fechaFinal).subscribe((data: any) => {
+            this.spinVentasPersona = false;
+            if (!data.bRta) return;
+            this.listPersonasMasVentas = data.data;
+            this.listPersonasMasVentas.forEach((element) => {
+                element.total_venta = Number(element.total_venta);
+                element.cantidad = Number(element.cantidad);
+                this.cantPersVendidos += element.cantidad;
+                this.totalPersVendidos += element.total_venta;
+            })
+        })
+    }
+
+    getComprasPorPersona(productoSeleccionado: string, personaSeleccionada: string, totalPersona: boolean) {
         this.listVentasPorPersona = [];
         this.comprasPorPersonaTotal = [];
-        this.tiendaService.getVentasPorPersona(personaSeleccionada, productoSeleccionado).subscribe((data: any) => {
+        this.spinVentaPersonaProducto = true;
+        this.tiendaService.getVentasPorPersonaProducto(personaSeleccionada, productoSeleccionado).subscribe((data: any) => {
+            this.spinVentaPersonaProducto = false;
             if (!data.bRta) return;
             this.listVentasPorPersona = data.data;
             let dataNueva: TO_ComprasPorPersona = {
@@ -238,20 +269,33 @@ export class TiendaOnlineComponent implements OnInit {
                 costo: 0,
                 utilidad: 0,
             };
-            this.listVentasPorPersona.forEach(element => {
-                dataNueva.nombre_persona = element.nombre_persona;
-                dataNueva.cantidad_ventas += Number(element.cantidad_ventas);
-                dataNueva.valor_unitario += Number(element.valor_unitario);
-                dataNueva.valor_total += Number(element.valor_total);
-                dataNueva.costo += Number(element.costo);
-                dataNueva.utilidad += Number(element.utilidad);
-            });
+            if (totalPersona) {
+                this.listVentasPorPersona.forEach(element => {
+                    dataNueva.nombre_persona = element.nombre_persona;
+                    dataNueva.cantidad_ventas += Number(element.cantidad_ventas);
+                    dataNueva.valor_unitario += Number(element.valor_unitario);
+                    dataNueva.valor_total += Number(element.valor_total);
+                    dataNueva.costo += Number(element.costo);
+                    dataNueva.utilidad += Number(element.utilidad);
+                });
+            }
+            else {
+                this.listVentasPorPersona.forEach(element => {
+                    dataNueva.nombre_persona = element.nombre_producto;
+                    dataNueva.cantidad_ventas += Number(element.cantidad_ventas);
+                    dataNueva.valor_unitario += Number(element.valor_unitario);
+                    dataNueva.valor_total += Number(element.valor_total);
+                    dataNueva.costo += Number(element.costo);
+                    dataNueva.utilidad += Number(element.utilidad);
+                });
+            }
             this.comprasPorPersonaTotal.push(dataNueva);
         })
         this.clear(this.tableVentasYProducto);
     }
 
     getProductos() {
+        this.spinProductos = true;
         let listaVentas = this.listTiendaOnline.filter((movimiento) => movimiento.descripcion.includes('Venta de Producto'));
         listaVentas.forEach(element => {
             let existe = this.listProductos.filter((prod) => prod.nombre == element.producto);
@@ -262,30 +306,80 @@ export class TiendaOnlineComponent implements OnInit {
         this.listProductos.forEach(element => {
             this.saveProducto(element, false);
         })
-
+        this.spinProductos = false;
         this.clear(this.tableProductos);
     }
 
     getRecargas() {
+        this.spinRecargas = true;
+        this.totalRecargasRealizadas = 0;
         this.tiendaService.getRecargas().subscribe((data: any) => {
+            this.spinRecargas = false;
             if (!data.bRta) return;
             this.listRecargas = data.data;
-            this.clear(this.tableRecargas);
+            this.listRecargas.forEach(element => {
+                element.valor_recarga = Number(element.valor_recarga);
+                this.totalRecargasRealizadas += Number(element.valor_recarga);
+            });
         })
     }
 
     getRecargasTotalizado() {
+        this.totalRecargas = 0;
+        this.listRecargasTotalizados = [];
+        this.spinRecargasTotalizadas = true;
         this.tiendaService.getRecargasTotalizado().subscribe((data: any) => {
+            this.spinRecargasTotalizadas = false;
             if (!data.bRta) return;
             this.listRecargasTotalizados = data.data;
-            this.clear(this.tableRecargas);
+            this.listRecargasTotalizados.forEach(element => {
+                element.valor_recarga = Number(element.valor_recarga);
+                this.totalRecargas += Number(element.valor_recarga);
+            });
         })
+    }
+
+    getRecargasPorFechas() {
+        let fechaInicial = this.rangoFechasRecargas[0] != null ? this.formatDate(this.rangoFechasRecargas[0]) : null;
+        let fechaFinal = this.rangoFechasRecargas[1] != null ? this.formatDate(this.rangoFechasRecargas[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.totalRecargasRealizadas = 0;
+        this.listRecargas = [];
+        this.tiendaService.getRecargasFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinRecargasTotalizadas = false;
+            if (!data.bRta) return;
+            this.listRecargas = data.data;
+            this.listRecargas.forEach(element => {
+                element.valor_recarga = Number(element.valor_recarga);
+                this.totalRecargasRealizadas += Number(element.valor_recarga);
+            });
+        })
+    }
+
+    getRecargasTotalizadoPorFechas() {
+        this.totalRecargas = 0;
+        let fechaInicial = this.rangoFechas[0] != null ? this.formatDate(this.rangoFechas[0]) : null;
+        let fechaFinal = this.rangoFechas[1] != null ? this.formatDate(this.rangoFechas[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listRecargasTotalizados = [];
+        this.tiendaService.getRecargasTotalizadoFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinRecargasTotalizadas = false;
+            if (!data.bRta) return;
+            this.listRecargasTotalizados = data.data;
+            this.listRecargasTotalizados.forEach(element => {
+                this.totalRecargas += Number(element.valor_recarga);
+            });
+        })
+
     }
 
     getDetalleRecarga(recargaP: TO_Recargas) {
         this.listDetalleRecargas = [];
-
+        this.spinDetalleRecarga = true;
         this.tiendaService.getDetalleRecarga(recargaP.cliente, recargaP.fecha_recarga).subscribe((data: any) => {
+            this.spinDetalleRecarga = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han realizado transacciones ' });
                 return;
@@ -306,7 +400,9 @@ export class TiendaOnlineComponent implements OnInit {
 
     getDetalleVenta(compraPorPersona: TO_ComprasPorPersona) {
         this.listDetalleVenta = [];
+        this.spinDetalleVenta = true;
         this.tiendaService.getDetalleVenta(compraPorPersona.nombre_persona, compraPorPersona.nombre_producto).subscribe((data: any) => {
+            this.spinDetalleVenta = false;
             if (!data.bRta) return;
             this.listDetalleVenta = data.data;
             this.clear(this.tableDetalleVenta);
@@ -321,7 +417,9 @@ export class TiendaOnlineComponent implements OnInit {
                 this.filterProd.nativeElement.value = '';
                 break;
             case this.tableRecargas:
-                this.filterRecar.nativeElement.value = '';
+                this.totalRecargasRealizadas = 0;
+                this.getRecargas();
+                this.rangoFechasRecargas = [];
                 break;
             case this.tableVentasYProducto:
                 this.filterVentasProdPerso.nativeElement.value = '';
@@ -330,7 +428,16 @@ export class TiendaOnlineComponent implements OnInit {
                 this.filterDetalleVenta.nativeElement.value = '';
                 break;
             case this.tableRecargasTotal:
-                this.filterRecarTota.nativeElement.value = '';
+                this.getRecargasTotalizado();
+                this.rangoFechas = [];
+                break;
+            case this.tableVXP:
+                this.getProductosMasVendidos();
+                this.rangoFechasProductos = [];
+                break;
+            case this.tableVentasXPersona:
+                this.getPersonasConMasVentas();
+                this.rangoFechasPersona = [];
                 break;
 
             default:
@@ -466,6 +573,54 @@ export class TiendaOnlineComponent implements OnInit {
             }
             this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se guardo el movimiento correctamente' });
         })
+    }
+
+    formatDate(date) {
+        return [
+            this.padTo2Digits(date.getDate()),
+            this.padTo2Digits(date.getMonth() + 1),
+            date.getFullYear(),
+        ].join('-');
+    }
+
+    padTo2Digits(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    filtroRecargas(filtro: string, columna: String) {
+        this.totalRecargasRealizadas = 0;
+        this.listRecargas.forEach(element => {
+            if (element[`${columna}`].includes(filtro)) {
+                this.totalRecargasRealizadas += Number(element.valor_recarga);
+            }
+            if (columna == 'valor_recarga') {
+                if (Number(element[`${columna}`]) == Number(filtro)) {
+                    this.totalRecargasRealizadas += Number(element.valor_recarga);
+                }
+            }
+        });
+    }
+
+    filtroProductos(filtro: string, columna: String) {
+        this.totalProdVendidos = 0;
+        this.cantProdVendidos = 0;
+        this.listProductosMasVendidos.forEach(element => {
+            if (element[`${columna}`].includes(filtro)) {
+                this.totalProdVendidos += Number(element.total_venta);
+                this.cantProdVendidos += Number(element.cantidad);
+            }
+        });
+    }
+
+    filtroPersona(filtro: string, columna: String) {
+        this.totalPersVendidos = 0;
+        this.cantPersVendidos = 0;
+        this.listPersonasMasVentas.forEach(element => {
+            if (element[`${columna}`].includes(filtro)) {
+                this.totalPersVendidos += Number(element.total_venta);
+                this.cantPersVendidos += Number(element.cantidad);
+            }
+        });
     }
 
 

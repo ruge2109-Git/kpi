@@ -17,11 +17,15 @@ export interface TiendaOnline {
 export interface TO_ProductosMasVendidos {
     nombre_producto: string;
     cantidad: number;
+    fecha_transaccion: string;
+    total_venta: number;
 }
 
 export interface TO_PersonasMasVentas {
     nombre_persona: string;
     cantidad: number;
+    fecha_transaccion: string;
+    total_venta: number;
 }
 
 export interface TO_ComprasPorPersona {

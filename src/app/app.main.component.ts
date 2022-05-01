@@ -29,7 +29,7 @@ export class AppMainComponent implements AfterViewInit, OnDestroy, OnInit {
 
     public overlayMenuActive: boolean;
 
-    public staticMenuInactive: boolean = false;
+    public staticMenuInactive: boolean = true;
 
     public profileActive: boolean;
 
@@ -52,7 +52,7 @@ export class AppMainComponent implements AfterViewInit, OnDestroy, OnInit {
     config: AppConfig;
 
     subscription: Subscription;
-    
+
     constructor(public renderer: Renderer2, public app: AppComponent, public configService: ConfigService) { }
 
     ngOnInit() {
@@ -74,7 +74,8 @@ export class AppMainComponent implements AfterViewInit, OnDestroy, OnInit {
             }
             else {
                 if (!this.menuClick && this.isOverlay()) {
-                    this.menuInactiveDesktop = true;
+                    // this.menuInactiveDesktop = true;
+                    this.menuInactiveDesktop = false;
                 }
                 if (!this.menuClick){
                     this.overlayMenuActive = false;

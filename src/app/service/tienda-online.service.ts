@@ -38,20 +38,44 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/recargas`);
     }
 
+    getRecargasFiltro(fechaInicial:string,fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/recargasFiltro/${fechaInicial}/${fechaFinal}`);
+    }
+
     getRecargasTotalizado() {
         return this.http.get(`${this.url}/tienda/recargasTotalizado`);
+    }
+
+    getRecargasTotalizadoFiltro(fechaInicial:string,fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/recargasTotalizadoFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
     getDetalleRecarga(persona:string,fecha:string) {
         return this.http.get(`${this.url}/tienda/detalleRecarga/${persona}/${fecha}`);
     }
 
-    getVentasPorPersona(persona:string,producto:string) {
+    getVentasPorPersonaProducto(persona:string,producto:string) {
         return this.http.get(`${this.url}/tienda/ventasPersonaProducto/${persona}/${producto}`);
     }
 
     getDetalleVenta(persona:string,producto:string) {
         return this.http.get(`${this.url}/tienda/detalleVenta/${persona}/${producto}`);
+    }
+
+    getVentasProducto() {
+        return this.http.get(`${this.url}/tienda/ventasProducto`);
+    }
+
+    getVentasProductoFiltro(fechaInicial:string,fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/ventasProductoFiltro/${fechaInicial}/${fechaFinal}`);
+    }
+
+    getVentasPersona() {
+        return this.http.get(`${this.url}/tienda/ventasPersona`);
+    }
+
+    getVentasPersonaFiltro(fechaInicial:string,fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/ventasPersonaFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
 
