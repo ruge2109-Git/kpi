@@ -1,10 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import { TiendaOnline, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
+import { TiendaOnline, TO_comisiones, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
 import readXlsxFile from 'read-excel-file';
 import { DatePipe } from '@angular/common';
 import { Table } from 'primeng/table';
 import { TiendaOnlineService } from 'src/app/service/tienda-online.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-tienda-online',
@@ -25,15 +26,28 @@ export class TiendaOnlineComponent implements OnInit {
     listRecargas: TO_Recargas[] = [];
     listRecargasTotalizados: TO_Recargas[] = [];
     listDetalleRecargas: TO_DetalleRecarga[] = [];
+    listComisiones: TO_comisiones[] = [];
 
     //Totalizados
-    comprasPorPersonaTotal: TO_ComprasPorPersona[] = [];
     totalRecargasRealizadas: number = 0;
     totalRecargas: number = 0;
     cantProdVendidos: number = 0;
     totalProdVendidos: number = 0;
     cantPersVendidos: number = 0;
     totalPersVendidos: number = 0;
+    totalValorRecargaDetalle: number = 0;
+    totalValorVentaRecargaDetalle: number = 0;
+    totalBalanceRecargaDetalle: number = 0;
+    cantVentasPerProd: number = 0;
+    totalUnitarioPerProd: number = 0;
+    totalGenePerProd: number = 0;
+    totalCostPerProd: number = 0;
+    totalUtilPerProd: number = 0;
+    totalValorVentaDetalle: number = 0;
+    totalCostoDetalle: number = 0;
+    totalUtilidadDetalle: number = 0;
+    compraPorPersonaSelected: TO_ComprasPorPersona;
+    cantTotalComisiones: number = 0;
     //Vista
     @ViewChild('tableVXP') tableVXP: Table;
     @ViewChild('tableVentasYProducto') tableVentasYProducto: Table;
@@ -43,13 +57,9 @@ export class TiendaOnlineComponent implements OnInit {
     @ViewChild('tableRecargasTotal') tableRecargasTotal: Table;
     @ViewChild('tableDetalleRecargas') tableDetalleRecargas: Table;
     @ViewChild('tableDetalleVenta') tableDetalleVenta: Table;
+    @ViewChild('tableComisiones') tableComisiones: Table;
 
     @ViewChild('filterProd') filterProd: ElementRef;
-    // @ViewChild('filterRecar') filterRecar: ElementRef;
-    @ViewChild('filterVentasProdPerso') filterVentasProdPerso: ElementRef;
-    @ViewChild('filterDetalleVenta') filterDetalleVenta: ElementRef;
-    // @ViewChild('filterRecarTota') filterRecarTota: ElementRef;
-    // @ViewChild('filterVentaProducto') filterVentaProducto: ElementRef;
     @ViewChild('filterVentasPersona') filterVentasPersona: ElementRef;
 
 
@@ -58,7 +68,12 @@ export class TiendaOnlineComponent implements OnInit {
     rangoFechas: Date[] = [];
     rangoFechasProductos: Date[] = [];
     rangoFechasPersona: Date[] = [];
-
+    rangoFechasProdPerson: Date[] = [];
+    rangoFechasDetalleVenta: Date[] = [];
+    rangoFechasComisiones: Date[] = [];
+    prodSelected: string = "";
+    personSelectd: string = "";
+    personComisiones: string = "";
     //Spiners
     spinIndicadores: boolean;
     spinProductos: boolean;
@@ -70,12 +85,12 @@ export class TiendaOnlineComponent implements OnInit {
     spinVentaPersonaProducto: boolean;
     spinVentasPersona: boolean;
     spinDetalleVenta: boolean;
+    spinComisiones: boolean;
 
 
     constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService) { }
 
     ngOnInit(): void {
-        this.getProductosDatabase();
         this.getTiendaOnlineDatabase();
     }
 
@@ -85,6 +100,7 @@ export class TiendaOnlineComponent implements OnInit {
         this.getPersonasConMasVentas();
         this.getRecargas();
         this.getRecargasTotalizado();
+        this.getProductosDatabase();
     }
 
     onUpload(event) {
@@ -121,7 +137,7 @@ export class TiendaOnlineComponent implements OnInit {
     readExcel() {
         this.uploadedFiles.forEach(element => {
             readXlsxFile(element).then((rows) => {
-                rows.forEach((element: any) => {
+                rows.forEach(async (element: any) => {
                     let descripcion = this.obtenerDescripcion(element[4]);
                     let producto = this.obtenerProducto(element[4]);
                     let idTransaccion = this.obtenerIdTransaccion(element[4]);
@@ -142,11 +158,14 @@ export class TiendaOnlineComponent implements OnInit {
                     let buscarEnLaLista = this.listTiendaOnline.filter((movimiento) => movimiento == tiendaOnlineObj);
                     if (buscarEnLaLista.length == 0) {
                         this.listTiendaOnline.push(tiendaOnlineObj);
-                        this.saveMovimiento(tiendaOnlineObj, false);
+                        await this.saveMovimiento(tiendaOnlineObj, false);
+                    }
+                    if (descripcion == 'Venta de Producto') {
+                        this.listProductos.push({ nombre: producto, costo_unitario: 0 });
+                        await this.saveProducto({ nombre: producto, costo_unitario: 0 }, false);
                     }
                 });
                 this.initData();
-                this.getProductos();
             })
         });
 
@@ -179,7 +198,10 @@ export class TiendaOnlineComponent implements OnInit {
         this.totalProdVendidos = 0;
         this.tiendaService.getVentasProducto().subscribe((data: any) => {
             this.spinVentasProducto = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado el top de productos' });
+                return;
+            }
             this.listProductosMasVendidos = data.data;
             this.listProductosMasVendidos.forEach(element => {
                 element.total_venta = Number(element.total_venta);
@@ -193,15 +215,20 @@ export class TiendaOnlineComponent implements OnInit {
     getProductosMasVendidosFiltro() {
         let fechaInicial = this.rangoFechasProductos[0] != null ? this.formatDate(this.rangoFechasProductos[0]) : null;
         let fechaFinal = this.rangoFechasProductos[1] != null ? this.formatDate(this.rangoFechasProductos[1]) : null;
-        if (fechaInicial == null) return;
+        if (fechaInicial == null) {
+            return;
+        };
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.listProductosMasVendidos = [];
         this.spinVentasProducto = true;
         this.cantProdVendidos = 0;
         this.totalProdVendidos = 0;
-        this.tiendaService.getVentasProductoFiltro(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this.tiendaService.getVentasProductoFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinVentasProducto = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado productos con el rango de fechas' });
+                return;
+            };
             this.listProductosMasVendidos = data.data;
             this.listProductosMasVendidos.forEach(element => {
                 element.total_venta = Number(element.total_venta);
@@ -219,7 +246,10 @@ export class TiendaOnlineComponent implements OnInit {
         this.totalPersVendidos = 0;
         this.tiendaService.getVentasPersona().subscribe((data: any) => {
             this.spinVentasPersona = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado el top de ventas' });
+                return;
+            };
             this.listPersonasMasVentas = data.data;
             this.listPersonasMasVentas.forEach((element) => {
                 element.total_venta = Number(element.total_venta);
@@ -239,9 +269,12 @@ export class TiendaOnlineComponent implements OnInit {
         this.spinVentasPersona = true;
         this.cantPersVendidos = 0;
         this.totalPersVendidos = 0;
-        this.tiendaService.getVentasPersonaFiltro(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this.tiendaService.getVentasPersonaFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinVentasPersona = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado ventas con el rango de fechas' });
+                return;
+            };
             this.listPersonasMasVentas = data.data;
             this.listPersonasMasVentas.forEach((element) => {
                 element.total_venta = Number(element.total_venta);
@@ -252,62 +285,74 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
-    getComprasPorPersona(productoSeleccionado: string, personaSeleccionada: string, totalPersona: boolean) {
+    getComprasPorPersona(productoSeleccionado: string, personaSeleccionada: string) {
+        this.prodSelected = productoSeleccionado;
+        this.personSelectd = personaSeleccionada;
         this.listVentasPorPersona = [];
-        this.comprasPorPersonaTotal = [];
         this.spinVentaPersonaProducto = true;
+        this.cantVentasPerProd = 0;
+        this.totalUnitarioPerProd = 0;
+        this.totalGenePerProd = 0;
+        this.totalCostPerProd = 0;
+        this.totalUtilPerProd = 0;
         this.tiendaService.getVentasPorPersonaProducto(personaSeleccionada, productoSeleccionado).subscribe((data: any) => {
             this.spinVentaPersonaProducto = false;
-            if (!data.bRta) return;
-            this.listVentasPorPersona = data.data;
-            let dataNueva: TO_ComprasPorPersona = {
-                nombre_persona: '',
-                nombre_producto: '',
-                cantidad_ventas: 0,
-                valor_unitario: 0,
-                valor_total: 0,
-                costo: 0,
-                utilidad: 0,
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado compras ' });
+                return;
             };
-            if (totalPersona) {
-                this.listVentasPorPersona.forEach(element => {
-                    dataNueva.nombre_persona = element.nombre_persona;
-                    dataNueva.cantidad_ventas += Number(element.cantidad_ventas);
-                    dataNueva.valor_unitario += Number(element.valor_unitario);
-                    dataNueva.valor_total += Number(element.valor_total);
-                    dataNueva.costo += Number(element.costo);
-                    dataNueva.utilidad += Number(element.utilidad);
-                });
-            }
-            else {
-                this.listVentasPorPersona.forEach(element => {
-                    dataNueva.nombre_persona = element.nombre_producto;
-                    dataNueva.cantidad_ventas += Number(element.cantidad_ventas);
-                    dataNueva.valor_unitario += Number(element.valor_unitario);
-                    dataNueva.valor_total += Number(element.valor_total);
-                    dataNueva.costo += Number(element.costo);
-                    dataNueva.utilidad += Number(element.utilidad);
-                });
-            }
-            this.comprasPorPersonaTotal.push(dataNueva);
+            this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Información encontrada correctamente' });
+            this.listVentasPorPersona = data.data;
+            this.listVentasPorPersona.forEach(element => {
+                element.cantidad_ventas = Number(element.cantidad_ventas);
+                element.valor_unitario = Number(element.valor_unitario);
+                element.valor_total = Number(element.valor_total);
+                element.costo = Number(element.costo);
+                element.utilidad = Number(element.utilidad);
+                this.cantVentasPerProd += element.cantidad_ventas;
+                this.totalUnitarioPerProd += element.valor_unitario;
+                this.totalGenePerProd += element.valor_total;
+                this.totalCostPerProd += element.costo;
+                this.totalUtilPerProd += element.utilidad;
+            });
+
         })
-        this.clear(this.tableVentasYProducto);
     }
 
-    getProductos() {
-        this.spinProductos = true;
-        let listaVentas = this.listTiendaOnline.filter((movimiento) => movimiento.descripcion.includes('Venta de Producto'));
-        listaVentas.forEach(element => {
-            let existe = this.listProductos.filter((prod) => prod.nombre == element.producto);
-            if (existe.length == 0) {
-                this.listProductos.push({ nombre: element.producto, costo_unitario: 0 });
-            }
-        });
-        this.listProductos.forEach(element => {
-            this.saveProducto(element, false);
+    getComprasPorPersonaFiltro() {
+        let fechaInicial = this.rangoFechasProdPerson[0] != null ? this.formatDate(this.rangoFechasProdPerson[0]) : null;
+        let fechaFinal = this.rangoFechasProdPerson[1] != null ? this.formatDate(this.rangoFechasProdPerson[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listVentasPorPersona = [];
+        this.spinVentaPersonaProducto = true;
+        this.cantVentasPerProd = 0;
+        this.totalUnitarioPerProd = 0;
+        this.totalGenePerProd = 0;
+        this.totalCostPerProd = 0;
+        this.totalUtilPerProd = 0;
+        this.tiendaService.getVentasPorPersonaProductoFiltro(this.personSelectd, this.prodSelected, fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinVentaPersonaProducto = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado compras ' });
+                return;
+            };
+            this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Información encontrada correctamente' });
+            this.listVentasPorPersona = data.data;
+            this.listVentasPorPersona.forEach(element => {
+                element.cantidad_ventas = Number(element.cantidad_ventas);
+                element.valor_unitario = Number(element.valor_unitario);
+                element.valor_total = Number(element.valor_total);
+                element.costo = Number(element.costo);
+                element.utilidad = Number(element.utilidad);
+                this.cantVentasPerProd += element.cantidad_ventas;
+                this.totalUnitarioPerProd += element.valor_unitario;
+                this.totalGenePerProd += element.valor_total;
+                this.totalCostPerProd += element.costo;
+                this.totalUtilPerProd += element.utilidad;
+            });
+
         })
-        this.spinProductos = false;
-        this.clear(this.tableProductos);
     }
 
     getRecargas() {
@@ -330,7 +375,10 @@ export class TiendaOnlineComponent implements OnInit {
         this.spinRecargasTotalizadas = true;
         this.tiendaService.getRecargasTotalizado().subscribe((data: any) => {
             this.spinRecargasTotalizadas = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas' });
+                return;
+            };
             this.listRecargasTotalizados = data.data;
             this.listRecargasTotalizados.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
@@ -348,7 +396,10 @@ export class TiendaOnlineComponent implements OnInit {
         this.listRecargas = [];
         this.tiendaService.getRecargasFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinRecargasTotalizadas = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango fechas indicadas' });
+                return;
+            };
             this.listRecargas = data.data;
             this.listRecargas.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
@@ -366,7 +417,10 @@ export class TiendaOnlineComponent implements OnInit {
         this.listRecargasTotalizados = [];
         this.tiendaService.getRecargasTotalizadoFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinRecargasTotalizadas = false;
-            if (!data.bRta) return;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango de fechas indicadas' });
+                return;
+            };
             this.listRecargasTotalizados = data.data;
             this.listRecargasTotalizados.forEach(element => {
                 this.totalRecargas += Number(element.valor_recarga);
@@ -378,6 +432,9 @@ export class TiendaOnlineComponent implements OnInit {
     getDetalleRecarga(recargaP: TO_Recargas) {
         this.listDetalleRecargas = [];
         this.spinDetalleRecarga = true;
+        this.totalValorRecargaDetalle = 0;
+        this.totalValorVentaRecargaDetalle = 0;
+        this.totalBalanceRecargaDetalle = 0;
         this.tiendaService.getDetalleRecarga(recargaP.cliente, recargaP.fecha_recarga).subscribe((data: any) => {
             this.spinDetalleRecarga = false;
             if (!data.bRta) {
@@ -385,27 +442,106 @@ export class TiendaOnlineComponent implements OnInit {
                 return;
             };
             this.listDetalleRecargas = data.data.map((data) => {
+                this.totalValorRecargaDetalle += Number(data.recarga);
+                this.totalValorVentaRecargaDetalle += Number(data.total_ventas);
+                this.totalBalanceRecargaDetalle += Number(data.total_ventas);
                 return {
                     persona: data.persona,
                     producto: data.producto,
-                    total_recarga: data.recarga,
-                    total_ventas: data.total_ventas,
-                    balance: data.recarga - data.total_ventas
+                    total_recarga: Number(data.recarga),
+                    total_ventas: Number(data.total_ventas),
+                    balance: data.recarga - Number(data.total_ventas)
                 }
             });
             this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Detalle encontrado' });
             this.clear(this.tableDetalleRecargas);
         })
+        this.getComisiones(recargaP.cliente);
+    }
+
+    getComisiones(persona: string) {
+        this.personComisiones = persona;
+        this.tiendaService.getComisiones(persona).subscribe((data: any) => {
+            this.spinComisiones = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado comisiones ' });
+                return;
+            };
+            this.listComisiones = data.data;
+            this.cantTotalComisiones = 0;
+            this.listComisiones.forEach(element => {
+                element.comisiones = Number(element.comisiones);
+                this.cantTotalComisiones += element.comisiones;
+            });
+            this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Comisiones encontradas' });
+
+        })
+    }
+
+    getComisionesPorFechas() {
+        let fechaInicial = this.rangoFechasComisiones[0] != null ? this.formatDate(this.rangoFechasComisiones[0]) : null;
+        let fechaFinal = this.rangoFechasComisiones[1] != null ? this.formatDate(this.rangoFechasComisiones[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.tiendaService.getComisionesFiltro(this.personComisiones, fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinComisiones = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado comisiones ' });
+                return;
+            };
+            this.listComisiones = data.data;
+            this.cantTotalComisiones = 0;
+            this.listComisiones.forEach(element => {
+                element.comisiones = Number(element.comisiones);
+                this.cantTotalComisiones += element.comisiones;
+            });
+        })
     }
 
     getDetalleVenta(compraPorPersona: TO_ComprasPorPersona) {
+        this.compraPorPersonaSelected = compraPorPersona;
         this.listDetalleVenta = [];
         this.spinDetalleVenta = true;
+        this.totalValorVentaDetalle = 0;
+        this.totalCostoDetalle = 0;
+        this.totalUtilidadDetalle = 0;
         this.tiendaService.getDetalleVenta(compraPorPersona.nombre_persona, compraPorPersona.nombre_producto).subscribe((data: any) => {
             this.spinDetalleVenta = false;
             if (!data.bRta) return;
             this.listDetalleVenta = data.data;
-            this.clear(this.tableDetalleVenta);
+            this.listDetalleVenta.forEach(element => {
+                element.valor_venta = Number(element.valor_venta);
+                element.costo_producto = Number(element.costo_producto);
+                element.utilidad = Number(element.utilidad);
+                this.totalValorVentaDetalle += element.valor_venta;
+                this.totalCostoDetalle += element.costo_producto;
+                this.totalUtilidadDetalle += element.utilidad;
+            });
+        })
+    }
+
+    getDetalleVentaFiltro() {
+        let fechaInicial = this.rangoFechasDetalleVenta[0] != null ? this.formatDate(this.rangoFechasDetalleVenta[0]) : null;
+        let fechaFinal = this.rangoFechasDetalleVenta[1] != null ? this.formatDate(this.rangoFechasDetalleVenta[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listDetalleVenta = [];
+        this.spinDetalleVenta = true;
+        this.totalValorVentaDetalle = 0;
+        this.totalCostoDetalle = 0;
+        this.totalUtilidadDetalle = 0;
+        this.tiendaService.getDetalleVentaFiltro(this.compraPorPersonaSelected.nombre_persona, this.compraPorPersonaSelected.nombre_producto, fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinDetalleVenta = false;
+            if (!data.bRta) return;
+            this.listDetalleVenta = data.data;
+            this.listDetalleVenta.forEach(element => {
+                element.valor_venta = Number(element.valor_venta);
+                element.costo_producto = Number(element.costo_producto);
+                element.utilidad = Number(element.utilidad);
+                this.totalValorVentaDetalle += element.valor_venta;
+                this.totalCostoDetalle += element.costo_producto;
+                this.totalUtilidadDetalle += element.utilidad;
+            });
         })
     }
 
@@ -422,10 +558,12 @@ export class TiendaOnlineComponent implements OnInit {
                 this.rangoFechasRecargas = [];
                 break;
             case this.tableVentasYProducto:
-                this.filterVentasProdPerso.nativeElement.value = '';
+                this.getComprasPorPersona(this.prodSelected, this.personSelectd);
+                this.rangoFechasProdPerson = [];
                 break;
             case this.tableDetalleVenta:
-                this.filterDetalleVenta.nativeElement.value = '';
+                this.getDetalleVenta(this.compraPorPersonaSelected);
+                this.rangoFechasDetalleVenta = [];
                 break;
             case this.tableRecargasTotal:
                 this.getRecargasTotalizado();
@@ -438,6 +576,10 @@ export class TiendaOnlineComponent implements OnInit {
             case this.tableVentasXPersona:
                 this.getPersonasConMasVentas();
                 this.rangoFechasPersona = [];
+                break;
+            case this.tableComisiones:
+                this.getComisiones(this.personComisiones);
+                this.rangoFechasComisiones = [];
                 break;
 
             default:
@@ -496,7 +638,6 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     obtenerDescripcion(descripcionDB: string) {
-
         if (descripcionDB.includes('Venta de Producto')) {
             return 'Venta de Producto';
         }
@@ -506,8 +647,8 @@ export class TiendaOnlineComponent implements OnInit {
         if (descripcionDB.includes('Recarga directa por el Administrador')) {
             return 'Recarga directa por el Administrador';
         }
-        if (descripcionDB.includes('Recarga directa por el Administrador')) {
-            return 'Recarga directa por el Administrador';
+        if (descripcionDB.includes('Recarga de saldo por el Administrador')) {
+            return 'Recarga de saldo por el Administrador';
         }
         if (descripcionDB.includes('Descuento de mi saldo por recarga a distribuidor')) {
             return 'Descuento de mi saldo por recarga a distribuidor';
@@ -553,8 +694,8 @@ export class TiendaOnlineComponent implements OnInit {
         return '0';
     }
 
-    saveProducto(prod: TO_Producto, mostrar: boolean) {
-        this.tiendaService.newProducto(prod).subscribe((data: any) => {
+    async saveProducto(prod: TO_Producto, mostrar: boolean) {
+        await lastValueFrom(this.tiendaService.newProducto(prod)).then((data: any) => {
             if (!mostrar) return;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'Ocurrio un error al intentar guardar el producto' });
@@ -564,8 +705,10 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
-    saveMovimiento(tiendaOnline: TiendaOnline, mostrar: boolean) {
-        this.tiendaService.newMovimientoTiendaOnline(tiendaOnline).subscribe((data: any) => {
+    async saveMovimiento(tiendaOnline: TiendaOnline, mostrar: boolean) {
+        const dateParts = tiendaOnline.fecha_transaccion.split("-");
+        tiendaOnline.fecha_transaccion = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+        await lastValueFrom(this.tiendaService.newMovimientoTiendaOnline(tiendaOnline)).then((data: any) => {
             if (!mostrar) return;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'Ocurrio un error al intentar guardar el movimiento' });
@@ -575,11 +718,11 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
-    formatDate(date) {
+    formatDate(date: Date) {
         return [
-            this.padTo2Digits(date.getDate()),
-            this.padTo2Digits(date.getMonth() + 1),
             date.getFullYear(),
+            this.padTo2Digits(date.getMonth() + 1),
+            this.padTo2Digits(date.getDate())
         ].join('-');
     }
 
@@ -590,7 +733,7 @@ export class TiendaOnlineComponent implements OnInit {
     filtroRecargas(filtro: string, columna: String) {
         this.totalRecargasRealizadas = 0;
         this.listRecargas.forEach(element => {
-            if (element[`${columna}`].includes(filtro)) {
+            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
                 this.totalRecargasRealizadas += Number(element.valor_recarga);
             }
             if (columna == 'valor_recarga') {
@@ -605,7 +748,7 @@ export class TiendaOnlineComponent implements OnInit {
         this.totalProdVendidos = 0;
         this.cantProdVendidos = 0;
         this.listProductosMasVendidos.forEach(element => {
-            if (element[`${columna}`].includes(filtro)) {
+            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
                 this.totalProdVendidos += Number(element.total_venta);
                 this.cantProdVendidos += Number(element.cantidad);
             }
@@ -622,6 +765,55 @@ export class TiendaOnlineComponent implements OnInit {
             }
         });
     }
+
+    filtroProdPerson(filtro: string, columna: String) {
+        this.cantVentasPerProd = 0;
+        this.totalUnitarioPerProd = 0;
+        this.totalGenePerProd = 0;
+        this.totalCostPerProd = 0;
+        this.totalUtilPerProd = 0;
+        this.listVentasPorPersona.forEach(element => {
+            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
+                element.cantidad_ventas = Number(element.cantidad_ventas);
+                element.valor_unitario = Number(element.valor_unitario);
+                element.valor_total = Number(element.valor_total);
+                element.costo = Number(element.costo);
+                element.utilidad = Number(element.utilidad);
+                this.cantVentasPerProd += element.cantidad_ventas;
+                this.totalUnitarioPerProd += element.valor_unitario;
+                this.totalGenePerProd += element.valor_total;
+                this.totalCostPerProd += element.costo;
+                this.totalUtilPerProd += element.utilidad;
+            }
+        });
+    }
+
+    filtroDetalleVenta(filtro: string, columna: String) {
+        this.totalValorVentaDetalle = 0;
+        this.totalCostoDetalle = 0;
+        this.totalUtilidadDetalle = 0;
+        this.listDetalleVenta.forEach(element => {
+            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
+                element.valor_venta = Number(element.valor_venta);
+                element.costo_producto = Number(element.costo_producto);
+                element.utilidad = Number(element.utilidad);
+                this.totalValorVentaDetalle += element.valor_venta;
+                this.totalCostoDetalle += element.costo_producto;
+                this.totalUtilidadDetalle += element.utilidad;
+            }
+        });
+    }
+
+    filtroComisiones(filtro: string, columna: String) {
+        this.cantTotalComisiones = 0;
+        this.listComisiones.forEach(element => {
+            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
+                element.comisiones = Number(element.comisiones);
+                this.cantTotalComisiones += element.comisiones;
+            }
+        });
+    }
+
 
 
 }

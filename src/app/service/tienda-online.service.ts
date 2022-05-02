@@ -18,7 +18,7 @@ export class TiendaOnlineService {
     }
 
     newProducto(producto: TO_Producto) {
-        return this.http.post(`${this.url}/productos/nuevo`,producto);
+        return this.http.post(`${this.url}/productos/nuevo`, producto);
     }
 
     //Tienda online
@@ -26,8 +26,8 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda`);
     }
 
-    newMovimientoTiendaOnline(tiendaOnline:TiendaOnline) {
-        return this.http.post(`${this.url}/tienda/nuevo`,tiendaOnline);
+    newMovimientoTiendaOnline(tiendaOnline: TiendaOnline) {
+        return this.http.post(`${this.url}/tienda/nuevo`, tiendaOnline);
     }
 
     getIndicadores() {
@@ -38,7 +38,7 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/recargas`);
     }
 
-    getRecargasFiltro(fechaInicial:string,fechaFinal:string) {
+    getRecargasFiltro(fechaInicial: string, fechaFinal: string) {
         return this.http.get(`${this.url}/tienda/recargasFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
@@ -46,27 +46,36 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/recargasTotalizado`);
     }
 
-    getRecargasTotalizadoFiltro(fechaInicial:string,fechaFinal:string) {
+    getRecargasTotalizadoFiltro(fechaInicial: string, fechaFinal: string) {
         return this.http.get(`${this.url}/tienda/recargasTotalizadoFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
-    getDetalleRecarga(persona:string,fecha:string) {
+    getDetalleRecarga(persona: string, fecha: string) {
         return this.http.get(`${this.url}/tienda/detalleRecarga/${persona}/${fecha}`);
     }
 
-    getVentasPorPersonaProducto(persona:string,producto:string) {
-        return this.http.get(`${this.url}/tienda/ventasPersonaProducto/${persona}/${producto}`);
+    getVentasPorPersonaProducto(persona: string, producto: string) {
+        return this.http.get(`${this.url}/tienda/ventasPersonaProducto/${btoa(persona)}/${btoa(producto)}`);
     }
 
-    getDetalleVenta(persona:string,producto:string) {
-        return this.http.get(`${this.url}/tienda/detalleVenta/${persona}/${producto}`);
+    getVentasPorPersonaProductoFiltro(persona: string, producto: string, fechaInicial:string, fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/ventasPersonaProductoFiltro/${btoa(persona)}/${btoa(producto)}/${fechaInicial}/${fechaFinal}`);
+    }
+
+
+    getDetalleVenta(persona: string, producto: string) {
+        return this.http.get(`${this.url}/tienda/detalleVenta/${btoa(persona)}/${btoa(producto)}`);
+    }
+
+    getDetalleVentaFiltro(persona: string, producto: string,fechaInicial:string,fechaFinal:string) {
+        return this.http.get(`${this.url}/tienda/detalleVentaFiltro/${btoa(persona)}/${btoa(producto)}/${fechaInicial}/${fechaFinal}`);
     }
 
     getVentasProducto() {
         return this.http.get(`${this.url}/tienda/ventasProducto`);
     }
 
-    getVentasProductoFiltro(fechaInicial:string,fechaFinal:string) {
+    getVentasProductoFiltro(fechaInicial: string, fechaFinal: string) {
         return this.http.get(`${this.url}/tienda/ventasProductoFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
@@ -74,8 +83,16 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/ventasPersona`);
     }
 
-    getVentasPersonaFiltro(fechaInicial:string,fechaFinal:string) {
+    getVentasPersonaFiltro(fechaInicial: string, fechaFinal: string) {
         return this.http.get(`${this.url}/tienda/ventasPersonaFiltro/${fechaInicial}/${fechaFinal}`);
+    }
+
+    getComisiones(persona:string) {
+        return this.http.get(`${this.url}/tienda/comisionesPorPersona/${btoa(persona)}`);
+    }
+
+    getComisionesFiltro(persona:string,fechaInicial: string, fechaFinal: string) {
+        return this.http.get(`${this.url}/tienda/comisionesPorPersona/${btoa(persona)}/${fechaInicial}/${fechaFinal}`);
     }
 
 

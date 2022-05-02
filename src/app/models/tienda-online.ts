@@ -31,6 +31,7 @@ export interface TO_PersonasMasVentas {
 export interface TO_ComprasPorPersona {
     nombre_persona: string;
     nombre_producto: string;
+    fecha_transaccion: string;
     cantidad_ventas: number;
     valor_unitario: number;
     valor_total: number;
@@ -53,17 +54,24 @@ export interface TO_Producto {
     costo_unitario: number;
 }
 
-export interface TO_Recargas{
+export interface TO_Recargas {
     administrador: string;
     cliente: string;
     valor_recarga: number;
     fecha_recarga: string;
 }
 
-export interface TO_DetalleRecarga{
+export interface TO_DetalleRecarga {
     persona: string;
     producto: string;
     total_recarga: number;
     total_ventas: number;
     balance: number;
+}
+
+export interface TO_comisiones {
+    usuario_vendedor: string;
+    producto: string;
+    fecha_transaccion: string;
+    comisiones: number;
 }
