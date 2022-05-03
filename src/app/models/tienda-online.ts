@@ -55,6 +55,7 @@ export interface TO_Producto {
 }
 
 export interface TO_Recargas {
+    cod_tienda_streaming: number;
     administrador: string;
     cliente: string;
     valor_recarga: number;
@@ -74,4 +75,17 @@ export interface TO_comisiones {
     producto: string;
     fecha_transaccion: string;
     comisiones: number;
+}
+
+export interface TO_archivos {
+    cod_transaccion?: number;
+    cod_tienda_streaming: number;
+    banco: string;
+    cuenta: string;
+    valor: number;
+    fecha: string;
+    hora: string;
+    numero_comprobante: string;
+    archivo: string;
+    nombre_archivo: string;
 }

@@ -38,9 +38,9 @@
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableProductos)"></button>
                 <span class="p-input-icon-left mb-2">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" #filterProd (input)="tableProductos.filterGlobal($event.target.value, 'contains')" placeholder="Buscar produccto" class="w-full"/>
-                    </span>
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" #filterProd (input)="tableProductos.filterGlobal($event.target.value, 'contains')" placeholder="Buscar produccto" class="w-full"/>
+                </span>
               </div>
             </ng-template>
             <ng-template pTemplate="header">
@@ -196,7 +196,8 @@
                     <td style="min-width: 12rem;">
                       {{data.fecha_recarga | date:'dd-MM-yyyy'}}
                     </td>
-                    <td>
+                    <td class="flex justify-content-center flex-column sm:flex-row">
+                      <button type="button" pButton pRipple icon="pi pi-file" (click)="verArchivosRecarga(data)" class="mr-3"></button>
                       <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)"></button>
                     </td>
                   </tr>
@@ -523,7 +524,7 @@
                   {{data.total_venta | currency:'$'}}
                 </td>
                 <td>
-                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersonaFiltro('None',data.nombre_persona)"></button>
+                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona('None',data.nombre_persona)"></button>
                 </td>
               </tr>
             </ng-template>
@@ -818,3 +819,159 @@
   </div>
 
 </div>
+
+
+<p-dialog header="Archivos" [(visible)]="display" [modal]="true" [style]="{width: '70vw'}" [draggable]="false" [resizable]="false">
+  <ng-template pTemplate="body">
+
+    <div class="card">
+      <h5>Recarga seleccionada</h5>
+      <p-table [value]="[0]" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Administrador</th>
+            <th>Cliente</th>
+            <th>Valor recarga</th>
+            <th>Fecha</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body">
+          <tr>
+            <td>{{recargaSeleccionada.administrador}}</td>
+            <td>{{recargaSeleccionada.cliente}}</td>
+            <td style="min-width: 12rem;">
+              {{recargaSeleccionada.fecha_recarga | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{recargaSeleccionada.valor_recarga | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <form #formArchivo="ngForm" (ngSubmit)="saveArchivo(formArchivo.value)">
+      <div class="card p-fluid">
+        <h5>Agregar archivo</h5>
+        <div class="p-formgrid grid">
+          <div class="field col">
+            <label>Banco</label>
+            <input pInputText id="bancoT" name="bancoT" type="text" ngModel/>
+          </div>
+          <div class="field col">
+            <label>Cuenta</label>
+            <input pInputText id="cuenta" name="cuentaT" type="text" ngModel/>
+          </div>
+          <div class="field col">
+            <label>valor</label>
+            <p-inputNumber id="valorT" name="valorT" mode="currency" currency="COP" locale="es-CO" ngModel></p-inputNumber>
+          </div>
+        </div>
+        <div class="p-formgrid grid">
+          <div class="field col">
+            <label>Fecha</label>
+            <p-calendar name="calendarT" [showIcon]="true" [showTime]="true" inputId="time" ngModel></p-calendar>
+          </div>
+          <div class="field col">
+            <label>N° de comprobante</label>
+            <input pInputText id="comprobante" name="comprobante" type="text" ngModel/>
+          </div>
+          <div class="field col">
+            <label>Archivo</label>
+            <div class="flex justify-content-start">
+              <p-fileUpload mode="basic" chooseLabel="Seleccione" #fileUpload (onSelect)="subirArchivoSoporte($event)"></p-fileUpload>
+              <button type="button" pButton pRipple icon="pi pi-trash" class="p-button-danger ml-2" (click)="cambiarArchivo(fileUpload)"></button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" pButton label="Submit"></button>
+      </div>
+    </form>
+
+    <div class="card">
+      <h5>Lista de archivos</h5>
+      <p-table [loading]="spinListaArchivos" #tableComisiones [value]="listArchivos" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['banco','cuenta','valor','fecha','hora','numero_comprobante']">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisiones)"></button>
+            <span class="p-input-icon-left mb-2">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" #filterProd (input)="tableComisiones.filterGlobal($event.target.value, 'contains')" placeholder="Buscar transacción" class="w-full"/>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="banco">Banco
+              <p-sortIcon field="banco"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cuenta">Cuenta
+              <p-sortIcon field="cuenta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="hora">Hora
+              <p-sortIcon field="hora"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cuenta">Cuenta
+              <p-sortIcon field="cuenta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="numero_comprobante">N° de comprobante
+              <p-sortIcon field="numero_comprobante"></p-sortIcon>
+            </th>
+            <th>Archivo</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.banco}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.cuenta}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.fecha}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.hora}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.cuenta}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.numero_comprobante}}
+            </td>
+            <td></td>
+            <td>
+              <button type="button" pButton pRipple icon="pi pi-trash" class="p-button-danger"></button>
+              <button type="button" pButton pRipple icon="pi pi-save"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-check" (click)="display=false" label="Ok" styleClass="p-button-text"></p-button>
+  </ng-template>
+</p-dialog>

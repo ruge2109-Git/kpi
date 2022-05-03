@@ -95,5 +95,9 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/comisionesPorPersona/${btoa(persona)}/${fechaInicial}/${fechaFinal}`);
     }
 
+    sendArchivos(data) {
+        return this.http.post(`${this.url}/tienda/saveArchivo`, data);
+    }
+
 
 }

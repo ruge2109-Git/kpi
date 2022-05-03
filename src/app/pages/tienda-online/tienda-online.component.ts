@@ -1,3 +1,4 @@
+import { TO_archivos } from './../../models/tienda-online';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { TiendaOnline, TO_comisiones, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
@@ -27,6 +28,7 @@ export class TiendaOnlineComponent implements OnInit {
     listRecargasTotalizados: TO_Recargas[] = [];
     listDetalleRecargas: TO_DetalleRecarga[] = [];
     listComisiones: TO_comisiones[] = [];
+    listArchivos: TO_archivos[] = [];
 
     //Totalizados
     totalRecargasRealizadas: number = 0;
@@ -86,7 +88,12 @@ export class TiendaOnlineComponent implements OnInit {
     spinVentasPersona: boolean;
     spinDetalleVenta: boolean;
     spinComisiones: boolean;
+    spinListaArchivos: boolean;
 
+    //Modal
+    display: boolean = false;
+    recargaSeleccionada: TO_Recargas;
+    fileSoporte: File;
 
     constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService) { }
 
@@ -431,6 +438,7 @@ export class TiendaOnlineComponent implements OnInit {
 
     getDetalleRecarga(recargaP: TO_Recargas) {
         this.listDetalleRecargas = [];
+        this.listComisiones = [];
         this.spinDetalleRecarga = true;
         this.totalValorRecargaDetalle = 0;
         this.totalValorVentaRecargaDetalle = 0;
@@ -585,6 +593,37 @@ export class TiendaOnlineComponent implements OnInit {
             default:
                 break;
         }
+    }
+
+    subirArchivoSoporte(files: any) {
+        this.fileSoporte = files.currentFiles[0];
+    }
+
+    cambiarArchivo(fileUpload) {
+        fileUpload.clear();
+    }
+
+    saveArchivo(formData) {
+        const reader = new FileReader();
+        reader.readAsDataURL(this.fileSoporte);
+        reader.onload = () => {
+
+            let nuevoArchivo: TO_archivos = {
+                cod_tienda_streaming: this.recargaSeleccionada.cod_tienda_streaming,
+                banco: formData.bancoT,
+                cuenta: formData.cuentaT,
+                valor: formData.valorT,
+                numero_comprobante: formData.comprobante,
+                fecha: this.formatDate(formData.calendarT),
+                archivo: reader.result.toString(),
+                nombre_archivo: this.fileSoporte.name,
+                hora: formData.calendarT.getHours() + ":" + formData.calendarT.getMinutes()
+            };
+            this.tiendaService.sendArchivos(nuevoArchivo).subscribe((data) => {
+                console.log(data);
+            })
+        };
+
     }
 
     // ***********
@@ -812,6 +851,15 @@ export class TiendaOnlineComponent implements OnInit {
                 this.cantTotalComisiones += element.comisiones;
             }
         });
+    }
+
+    verArchivosRecarga(recargaSeleccionada: TO_Recargas) {
+        this.listArchivos = [];
+        this.recargaSeleccionada = recargaSeleccionada;
+
+
+
+        this.display = true;
     }
 
 
