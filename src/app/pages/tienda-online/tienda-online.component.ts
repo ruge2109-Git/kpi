@@ -110,12 +110,12 @@ export class TiendaOnlineComponent implements OnInit {
         this.getProductosDatabase();
     }
 
-    onUpload(event) {
+    async onUpload(event) {
         for (const file of event.files) {
             this.uploadedFiles.push(file);
         }
+        await this.readExcel();
         this.messageService.add({ severity: 'info', summary: 'Correcto', detail: 'Archivo procesado correctamente' });
-        this.readExcel();
     }
 
     getProductosDatabase() {
@@ -141,41 +141,40 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
-    readExcel() {
-        this.uploadedFiles.forEach(element => {
-            readXlsxFile(element).then((rows) => {
-                rows.forEach(async (element: any) => {
-                    let descripcion = this.obtenerDescripcion(element[4]);
-                    let producto = this.obtenerProducto(element[4]);
-                    let idTransaccion = this.obtenerIdTransaccion(element[4]);
-                    let valorVenta = this.obtenerValorDeLaVenta(element[4]);
+    async readExcel() {
+        for (const element of this.uploadedFiles) {
+            await readXlsxFile(element).then((rows) => {
+                for (const element2 of rows) {
+
+                    let descripcion = this.obtenerDescripcion(element2[4] + "");
+                    let producto = this.obtenerProducto(element2[4] + "");
+                    let idTransaccion = this.obtenerIdTransaccion(element2[4] + "");
+                    let valorVenta = this.obtenerValorDeLaVenta(element2[4] + "");
                     let tiendaOnlineObj: TiendaOnline = {
-                        cod_tienda_streaming: element[0],
-                        fecha_transaccion: this.parsearFecha(element[1].replace(" | ", "T").replace(" ", "\/")),
-                        usuario_cliente: element[2],
-                        usuario_vendedor: element[3],
+                        cod_tienda_streaming: Number(element2[0]),
+                        fecha_transaccion: this.parsearFecha(element2[1].toString().replace(" | ", "T").replace(" ", "\/")),
+                        usuario_cliente: element2[2] + "",
+                        usuario_vendedor: element2[3] + "",
                         descripcion: descripcion,
                         producto: producto,
                         id_transaccion: idTransaccion,
-                        saldo: element[5],
-                        saldo_adicional: Number(element[6].replace(/\$|\.|\+| |\-/g, '')),
-                        saldo_total: element[7],
+                        saldo: Number(element2[5]),
+                        saldo_adicional: Number(element2[6].toString().replace(/\$|\.|\+| |\-/g, '')),
+                        saldo_total: Number(element2[7]),
                         valor_venta: Number(valorVenta.replace(/\$|\.|\+| |\-/g, ''))
                     };
                     let buscarEnLaLista = this.listTiendaOnline.filter((movimiento) => movimiento == tiendaOnlineObj);
                     if (buscarEnLaLista.length == 0) {
                         this.listTiendaOnline.push(tiendaOnlineObj);
-                        await this.saveMovimiento(tiendaOnlineObj, false);
                     }
                     if (descripcion == 'Venta de Producto') {
                         this.listProductos.push({ nombre: producto, costo_unitario: 0 });
-                        await this.saveProducto({ nombre: producto, costo_unitario: 0 }, false);
                     }
-                });
-                this.initData();
+                }
             })
-        });
-
+        }
+        this.saveProductoMasivo();
+        this.saveMovimientoMasivo();
     }
 
     getIndicadores() {
@@ -744,17 +743,34 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
-    async saveMovimiento(tiendaOnline: TiendaOnline, mostrar: boolean) {
-        const dateParts = tiendaOnline.fecha_transaccion.split("-");
-        tiendaOnline.fecha_transaccion = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
-        await lastValueFrom(this.tiendaService.newMovimientoTiendaOnline(tiendaOnline)).then((data: any) => {
-            if (!mostrar) return;
-            if (!data.bRta) {
-                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'Ocurrio un error al intentar guardar el movimiento' });
-                return;
-            }
-            this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se guardo el movimiento correctamente' });
-        })
+    async saveProductoMasivo() {
+        this.spinProductos = true;
+        for (const producto of this.listProductos) {
+            await lastValueFrom(this.tiendaService.newProducto(producto)).then((data: any) => { });
+        }
+        this.spinProductos = false;
+        this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se ha terminado el cargue de productos' });
+
+    }
+
+    async saveMovimientoMasivo() {
+        this.spinIndicadores = true;
+        this.spinRecargas = true;
+        this.spinRecargasTotalizadas = true;
+        this.spinVentasProducto = true;
+        this.spinVentasPersona = true;
+        for (const tiendaOnline of this.listTiendaOnline) {
+            const dateParts = tiendaOnline.fecha_transaccion.split("-");
+            tiendaOnline.fecha_transaccion = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+            await lastValueFrom(this.tiendaService.newMovimientoTiendaOnline(tiendaOnline)).then((data: any) => { });
+        }
+        this.spinIndicadores = false;
+        this.spinRecargas = false;
+        this.spinRecargasTotalizadas = false;
+        this.spinVentasProducto = false;
+        this.spinVentasPersona = false;
+        this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se ha terminado el cargue de movimientos' });
+        this.initData();
     }
 
     formatDate(date: Date) {
