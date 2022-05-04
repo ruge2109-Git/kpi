@@ -1,6 +1,6 @@
 import { TO_archivos } from './../../models/tienda-online';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { TiendaOnline, TO_comisiones, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
 import readXlsxFile from 'read-excel-file';
 import { DatePipe } from '@angular/common';
@@ -29,6 +29,7 @@ export class TiendaOnlineComponent implements OnInit {
     listDetalleRecargas: TO_DetalleRecarga[] = [];
     listComisiones: TO_comisiones[] = [];
     listArchivos: TO_archivos[] = [];
+    listArchivosFile: Array<object> = [];
 
     //Totalizados
     totalRecargasRealizadas: number = 0;
@@ -95,7 +96,7 @@ export class TiendaOnlineComponent implements OnInit {
     recargaSeleccionada: TO_Recargas;
     fileSoporte: File;
 
-    constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService) { }
+    constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService, private confirmationService: ConfirmationService) { }
 
     ngOnInit(): void {
         this.getTiendaOnlineDatabase();
@@ -602,27 +603,39 @@ export class TiendaOnlineComponent implements OnInit {
         fileUpload.clear();
     }
 
-    saveArchivo(formData) {
+    async saveArchivo(formData) {
         const reader = new FileReader();
         reader.readAsDataURL(this.fileSoporte);
-        reader.onload = () => {
+        let archivoStr;
+        reader.onloadend = () => {
+            archivoStr = reader.result;
+        };
+        await this.timeout(100);
 
-            let nuevoArchivo: TO_archivos = {
-                cod_tienda_streaming: this.recargaSeleccionada.cod_tienda_streaming,
-                banco: formData.bancoT,
-                cuenta: formData.cuentaT,
-                valor: formData.valorT,
-                numero_comprobante: formData.comprobante,
-                fecha: this.formatDate(formData.calendarT),
-                archivo: reader.result.toString(),
-                nombre_archivo: this.fileSoporte.name,
-                hora: formData.calendarT.getHours() + ":" + formData.calendarT.getMinutes()
-            };
-            this.tiendaService.sendArchivos(nuevoArchivo).subscribe((data) => {
-                console.log(data);
-            })
+        let nuevoArchivo: TO_archivos = {
+            cod_tienda_streaming: this.recargaSeleccionada.cod_tienda_streaming,
+            banco: formData.bancoT,
+            cuenta: formData.cuentaT,
+            valor: formData.valorT,
+            numero_comprobante: formData.comprobante,
+            fecha: this.formatDate(formData.calendarT),
+            archivo: archivoStr,
+            nombre_archivo: this.fileSoporte.name,
+            hora: formData.calendarT.getHours() + ":" + formData.calendarT.getMinutes()
         };
 
+        this.tiendaService.sendArchivos(nuevoArchivo).subscribe((data: any) => {
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: data.mSmg });
+                return;
+            }
+            this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Transacción guardada correctamente' });
+            this.verArchivosRecarga(this.recargaSeleccionada);
+        })
+    }
+
+    timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // ***********
@@ -732,9 +745,8 @@ export class TiendaOnlineComponent implements OnInit {
         return '0';
     }
 
-    async saveProducto(prod: TO_Producto, mostrar: boolean) {
-        await lastValueFrom(this.tiendaService.newProducto(prod)).then((data: any) => {
-            if (!mostrar) return;
+    async updateProducto(prod: TO_Producto) {
+        this.tiendaService.updateProducto(prod).subscribe((data: any) => {
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'Ocurrio un error al intentar guardar el producto' });
                 return;
@@ -870,14 +882,34 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     verArchivosRecarga(recargaSeleccionada: TO_Recargas) {
+        this.display = true;
         this.listArchivos = [];
         this.recargaSeleccionada = recargaSeleccionada;
-
-
-
-        this.display = true;
+        this.tiendaService.getArchivosPorRecarga(recargaSeleccionada.cod_tienda_streaming + "").subscribe((data: any) => {
+            if (!data.bRta) {
+                return;
+            }
+            this.listArchivos = data.data;
+        })
     }
 
-
+    eliminarArchivo(event: Event, data: TO_archivos) {
+        this.confirmationService.confirm({
+            key: 'confirm2',
+            target: event.target,
+            message: '¿Desea eliminar esta transacción?',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.tiendaService.deleteTransaccion(data.cod_transaccion).subscribe((data: any) => {
+                    if (!data.bRta) {
+                        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrio un error al intentar eliminar la transacción' });
+                        return;
+                    }
+                    this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Transacción eliminada correctamente' });
+                    this.verArchivosRecarga(this.recargaSeleccionada);
+                })
+            },
+        });
+    }
 
 }

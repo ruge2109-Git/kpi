@@ -141,8 +141,8 @@ import { ErrorComponent } from './components/error/error.component';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { AccessComponent } from './components/access/access.component';
 import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.component';
-import { MessageService } from 'primeng/api';
-
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { NgImageFullscreenViewModule } from 'ng-image-fullscreen-view';
 @NgModule({
     imports: [
         BrowserModule,
@@ -232,6 +232,7 @@ import { MessageService } from 'primeng/api';
         VirtualScrollerModule,
         AppCodeModule,
         StyleClassModule,
+        NgImageFullscreenViewModule
     ],
     declarations: [
         AppComponent,
@@ -289,7 +290,8 @@ import { MessageService } from 'primeng/api';
         ProductService,
         MenuService,
         ConfigService,
-        MessageService
+        MessageService,
+        ConfirmationService
     ],
     bootstrap: [AppComponent]
 })

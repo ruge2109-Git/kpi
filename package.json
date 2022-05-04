@@ -8,15 +8,15 @@
         "build": "ng build --configuration production",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
-        "heroku-postbuild":"ng build --configuration production"
+        "heroku-postbuild": "ng build --configuration production"
     },
     "private": true,
     "dependencies": {
         "@angular/animations": "~13.0.0",
         "@angular/cdk": "~13.0.0",
+        "@angular/cli": "~13.0.4",
         "@angular/common": "~13.0.0",
         "@angular/compiler": "~13.0.0",
-        "@angular/cli": "~13.0.4",
         "@angular/compiler-cli": "~13.0.0",
         "@angular/core": "~13.0.0",
         "@angular/forms": "~13.0.0",
@@ -24,6 +24,8 @@
         "@angular/platform-browser-dynamic": "~13.0.0",
         "@angular/router": "~13.0.0",
         "chart.js": "^3.3.2",
+        "express": "^4.18.1",
+        "path": "^0.12.7",
         "primeflex": "^3.1.0",
         "primeicons": "5.0.0",
         "primeng": "^13.1.0",
@@ -32,11 +34,9 @@
         "rxjs": "~7.4.0",
         "save": "^2.5.0",
         "tslib": "^2.3.0",
-        "web-animations-js": "^2.3.2",
-        "zone.js": "~0.11.4",
         "typescript": "~4.4.3",
-        "express":"^4.18.1",
-        "path":"^0.12.7"
+        "web-animations-js": "^2.3.2",
+        "zone.js": "~0.11.4"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "^13.3.4",
@@ -61,6 +61,6 @@
     },
     "engines": {
         "node": "16.13.2",
-        "npm":"8.1.2"
+        "npm": "8.1.2"
     }
 }

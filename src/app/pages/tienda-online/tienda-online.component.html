@@ -63,7 +63,7 @@
                   <p-inputNumber mode="decimal" [(ngModel)]="data.costo_unitario"></p-inputNumber>
                 </td>
                 <td>
-                  <button type="button" pButton pRipple icon="pi pi-save" (click)="saveProducto(data,true)"></button>
+                  <button type="button" pButton pRipple icon="pi pi-save" (click)="updateProducto(data)"></button>
                 </td>
               </tr>
             </ng-template>
@@ -856,25 +856,25 @@
         <div class="p-formgrid grid">
           <div class="field col">
             <label>Banco</label>
-            <input pInputText id="bancoT" name="bancoT" type="text" ngModel/>
+            <input pInputText id="bancoT" name="bancoT" type="text" ngModel required="true" />
           </div>
           <div class="field col">
             <label>Cuenta</label>
-            <input pInputText id="cuenta" name="cuentaT" type="text" ngModel/>
+            <input pInputText id="cuenta" name="cuentaT" type="text" ngModel required="true" />
           </div>
           <div class="field col">
             <label>valor</label>
-            <p-inputNumber id="valorT" name="valorT" mode="currency" currency="COP" locale="es-CO" ngModel></p-inputNumber>
+            <p-inputNumber id="valorT" name="valorT"  ngModel required="true"></p-inputNumber>
           </div>
         </div>
         <div class="p-formgrid grid">
           <div class="field col">
             <label>Fecha</label>
-            <p-calendar name="calendarT" [showIcon]="true" [showTime]="true" inputId="time" ngModel></p-calendar>
+            <p-calendar name="calendarT" [showIcon]="true" [showTime]="true" inputId="time" ngModel required="true"></p-calendar>
           </div>
           <div class="field col">
             <label>N° de comprobante</label>
-            <input pInputText id="comprobante" name="comprobante" type="text" ngModel/>
+            <input pInputText id="comprobante" name="comprobante" type="text" ngModel required="true" />
           </div>
           <div class="field col">
             <label>Archivo</label>
@@ -884,7 +884,9 @@
             </div>
           </div>
         </div>
-        <button type="submit" pButton label="Submit"></button>
+        <button type="submit" pButton label="Guardar" [disabled]="formArchivo.invalid && fileSoporte == null"></button>
+        <p-messages></p-messages>
+
       </div>
     </form>
 
@@ -936,7 +938,7 @@
               {{data.cuenta}}
             </td>
             <td style="min-width: 12rem;">
-              {{data.valor}}
+              {{data.valor | currency:'$'}}
             </td>
             <td style="min-width: 12rem;">
               {{data.fecha}}
@@ -950,10 +952,15 @@
             <td style="min-width: 12rem;">
               {{data.numero_comprobante}}
             </td>
-            <td></td>
-            <td>
-              <button type="button" pButton pRipple icon="pi pi-trash" class="p-button-danger"></button>
-              <button type="button" pButton pRipple icon="pi pi-save"></button>
+            <td style="min-width: 12rem;">
+              <p-image [src]="data.archivo" width="150" [preview]="true" styleClass="imageClass"></p-image>
+            </td>
+            <td style="min-width: 12rem;">
+              <div class="flex justify-content-start">
+                <button type="button" pButton pRipple icon="pi pi-trash" class="p-button-danger mr-3" (click)="eliminarArchivo($event,data)"></button>
+                <p-confirmPopup key="confirm2"></p-confirmPopup>
+
+              </div>
             </td>
           </tr>
         </ng-template>

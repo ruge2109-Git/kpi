@@ -21,6 +21,10 @@ export class TiendaOnlineService {
         return this.http.post(`${this.url}/productos/nuevo`, producto);
     }
 
+    updateProducto(producto: TO_Producto) {
+        return this.http.put(`${this.url}/productos/actualizar`, producto);
+    }
+
     //Tienda online
     getTiendaOnline() {
         return this.http.get(`${this.url}/tienda`);
@@ -95,9 +99,21 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/comisionesPorPersona/${btoa(persona)}/${fechaInicial}/${fechaFinal}`);
     }
 
+
     sendArchivos(data) {
         return this.http.post(`${this.url}/tienda/saveArchivo`, data);
     }
 
+    getArchivosPorRecarga(codtiendaStreaming:string) {
+        return this.http.get(`${this.url}/tienda/archivosPorRecarga/${btoa(codtiendaStreaming)}`);
+    }
+
+    getArchivosPorRecargaFiltro(codtiendaStreaming:string,fechaInicial: string, fechaFinal: string) {
+        return this.http.get(`${this.url}/tienda/archivosPorRecargaFiltro/${btoa(codtiendaStreaming)}/${fechaInicial}/${fechaFinal}`);
+    }
+
+    deleteTransaccion(idTransaccion) {
+        return this.http.delete(`${this.url}/tienda/deleteArchivo/${idTransaccion}`);
+    }
 
 }
