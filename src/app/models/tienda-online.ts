@@ -60,6 +60,7 @@ export interface TO_Recargas {
     cliente: string;
     valor_recarga: number;
     fecha_recarga: string;
+    tiene_archivos: number;
 }
 
 export interface TO_DetalleRecarga {

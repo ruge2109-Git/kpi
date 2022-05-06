@@ -96,6 +96,10 @@ export class TiendaOnlineComponent implements OnInit {
     recargaSeleccionada: TO_Recargas;
     fileSoporte: File;
 
+    //Progreso
+    showProgressBar: boolean = false;
+    valueProgressBar: number = 1;
+
     constructor(private messageService: MessageService, private tiendaService: TiendaOnlineService, private confirmationService: ConfirmationService) { }
 
     ngOnInit(): void {
@@ -610,7 +614,7 @@ export class TiendaOnlineComponent implements OnInit {
         reader.onloadend = () => {
             archivoStr = reader.result;
         };
-        await this.timeout(100);
+        await this.timeout(200);
 
         let nuevoArchivo: TO_archivos = {
             cod_tienda_streaming: this.recargaSeleccionada.cod_tienda_streaming,
@@ -766,6 +770,9 @@ export class TiendaOnlineComponent implements OnInit {
     }
 
     async saveMovimientoMasivo() {
+        this.showProgressBar = true;
+        let dataSubir = this.listTiendaOnline.length;
+        let contador = 1;
         this.spinIndicadores = true;
         this.spinRecargas = true;
         this.spinRecargasTotalizadas = true;
@@ -775,6 +782,8 @@ export class TiendaOnlineComponent implements OnInit {
             const dateParts = tiendaOnline.fecha_transaccion.split("-");
             tiendaOnline.fecha_transaccion = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
             await lastValueFrom(this.tiendaService.newMovimientoTiendaOnline(tiendaOnline)).then((data: any) => { });
+            this.valueProgressBar = Math.round((contador*100)/dataSubir );
+            contador++;
         }
         this.spinIndicadores = false;
         this.spinRecargas = false;
@@ -783,6 +792,8 @@ export class TiendaOnlineComponent implements OnInit {
         this.spinVentasPersona = false;
         this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se ha terminado el cargue de movimientos' });
         this.initData();
+        this.showProgressBar = false;
+
     }
 
     formatDate(date: Date) {

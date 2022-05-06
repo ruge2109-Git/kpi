@@ -8,6 +8,10 @@
       </p-fileUpload>
     </div>
 
+    <div class="mb-4" *ngIf="showProgressBar">
+      <h5>Barra de progreso</h5>
+      <p-progressBar [value]="valueProgressBar"></p-progressBar>
+    </div>
     <!--Indicadores-->
     <div class="grid mb-3">
       <div class="col-12 lg:col-4 xl:col-4" *ngFor="let item of listIndicadores">
@@ -197,8 +201,8 @@
                       {{data.fecha_recarga | date:'dd-MM-yyyy'}}
                     </td>
                     <td class="flex justify-content-center flex-column sm:flex-row">
-                      <button type="button" pButton pRipple icon="pi pi-file" (click)="verArchivosRecarga(data)" class="mr-3"></button>
-                      <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)"></button>
+                      <button type="button" pButton pRipple icon="pi pi-file" (click)="verArchivosRecarga(data)" [ngClass]="{'p-button-outlined': data.tiene_archivos == 0}"></button>
+                      <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)" class="ml-3"></button>
                     </td>
                   </tr>
                 </ng-template>
@@ -864,7 +868,7 @@
           </div>
           <div class="field col">
             <label>valor</label>
-            <p-inputNumber id="valorT" name="valorT"  ngModel required="true"></p-inputNumber>
+            <p-inputNumber id="valorT" name="valorT" ngModel required="true"></p-inputNumber>
           </div>
         </div>
         <div class="p-formgrid grid">
