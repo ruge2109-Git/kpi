@@ -3,7 +3,6 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { TiendaOnline, TO_comisiones, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
 import readXlsxFile from 'read-excel-file';
-import { DatePipe } from '@angular/common';
 import { Table } from 'primeng/table';
 import { TiendaOnlineService } from 'src/app/service/tienda-online.service';
 import { lastValueFrom } from 'rxjs';
@@ -205,8 +204,6 @@ export class TiendaOnlineComponent implements OnInit {
     getProductosMasVendidos() {
         this.listProductosMasVendidos = [];
         this.spinVentasProducto = true;
-        this.cantProdVendidos = 0;
-        this.totalProdVendidos = 0;
         this.tiendaService.getVentasProducto().subscribe((data: any) => {
             this.spinVentasProducto = false;
             if (!data.bRta) {
@@ -214,12 +211,6 @@ export class TiendaOnlineComponent implements OnInit {
                 return;
             }
             this.listProductosMasVendidos = data.data;
-            this.listProductosMasVendidos.forEach(element => {
-                element.total_venta = Number(element.total_venta);
-                element.cantidad = Number(element.cantidad);
-                this.cantProdVendidos += element.cantidad;
-                this.totalProdVendidos += element.total_venta;
-            });
         })
     }
 
@@ -232,8 +223,6 @@ export class TiendaOnlineComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.listProductosMasVendidos = [];
         this.spinVentasProducto = true;
-        this.cantProdVendidos = 0;
-        this.totalProdVendidos = 0;
         this.tiendaService.getVentasProductoFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinVentasProducto = false;
             if (!data.bRta) {
@@ -244,8 +233,6 @@ export class TiendaOnlineComponent implements OnInit {
             this.listProductosMasVendidos.forEach(element => {
                 element.total_venta = Number(element.total_venta);
                 element.cantidad = Number(element.cantidad);
-                this.cantProdVendidos += element.cantidad;
-                this.totalProdVendidos += element.total_venta;
             });
         })
     }
@@ -253,8 +240,6 @@ export class TiendaOnlineComponent implements OnInit {
     getPersonasConMasVentas() {
         this.listPersonasMasVentas = [];
         this.spinVentasPersona = true;
-        this.cantPersVendidos = 0;
-        this.totalPersVendidos = 0;
         this.tiendaService.getVentasPersona().subscribe((data: any) => {
             this.spinVentasPersona = false;
             if (!data.bRta) {
@@ -262,12 +247,6 @@ export class TiendaOnlineComponent implements OnInit {
                 return;
             };
             this.listPersonasMasVentas = data.data;
-            this.listPersonasMasVentas.forEach((element) => {
-                element.total_venta = Number(element.total_venta);
-                element.cantidad = Number(element.cantidad);
-                this.cantPersVendidos += element.cantidad;
-                this.totalPersVendidos += element.total_venta;
-            })
         })
     }
 
@@ -278,8 +257,6 @@ export class TiendaOnlineComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.listPersonasMasVentas = [];
         this.spinVentasPersona = true;
-        this.cantPersVendidos = 0;
-        this.totalPersVendidos = 0;
         this.tiendaService.getVentasPersonaFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinVentasPersona = false;
             if (!data.bRta) {
@@ -290,8 +267,6 @@ export class TiendaOnlineComponent implements OnInit {
             this.listPersonasMasVentas.forEach((element) => {
                 element.total_venta = Number(element.total_venta);
                 element.cantidad = Number(element.cantidad);
-                this.cantPersVendidos += element.cantidad;
-                this.totalPersVendidos += element.total_venta;
             })
         })
     }
@@ -301,11 +276,6 @@ export class TiendaOnlineComponent implements OnInit {
         this.personSelectd = personaSeleccionada;
         this.listVentasPorPersona = [];
         this.spinVentaPersonaProducto = true;
-        this.cantVentasPerProd = 0;
-        this.totalUnitarioPerProd = 0;
-        this.totalGenePerProd = 0;
-        this.totalCostPerProd = 0;
-        this.totalUtilPerProd = 0;
         this.tiendaService.getVentasPorPersonaProducto(personaSeleccionada, productoSeleccionado).subscribe((data: any) => {
             this.spinVentaPersonaProducto = false;
             if (!data.bRta) {
@@ -320,11 +290,6 @@ export class TiendaOnlineComponent implements OnInit {
                 element.valor_total = Number(element.valor_total);
                 element.costo = Number(element.costo);
                 element.utilidad = Number(element.utilidad);
-                this.cantVentasPerProd += element.cantidad_ventas;
-                this.totalUnitarioPerProd += element.valor_unitario;
-                this.totalGenePerProd += element.valor_total;
-                this.totalCostPerProd += element.costo;
-                this.totalUtilPerProd += element.utilidad;
             });
 
         })
@@ -337,11 +302,7 @@ export class TiendaOnlineComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.listVentasPorPersona = [];
         this.spinVentaPersonaProducto = true;
-        this.cantVentasPerProd = 0;
-        this.totalUnitarioPerProd = 0;
-        this.totalGenePerProd = 0;
-        this.totalCostPerProd = 0;
-        this.totalUtilPerProd = 0;
+
         this.tiendaService.getVentasPorPersonaProductoFiltro(this.personSelectd, this.prodSelected, fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinVentaPersonaProducto = false;
             if (!data.bRta) {
@@ -356,11 +317,6 @@ export class TiendaOnlineComponent implements OnInit {
                 element.valor_total = Number(element.valor_total);
                 element.costo = Number(element.costo);
                 element.utilidad = Number(element.utilidad);
-                this.cantVentasPerProd += element.cantidad_ventas;
-                this.totalUnitarioPerProd += element.valor_unitario;
-                this.totalGenePerProd += element.valor_total;
-                this.totalCostPerProd += element.costo;
-                this.totalUtilPerProd += element.utilidad;
             });
 
         })
@@ -368,14 +324,12 @@ export class TiendaOnlineComponent implements OnInit {
 
     getRecargas() {
         this.spinRecargas = true;
-        this.totalRecargasRealizadas = 0;
         this.tiendaService.getRecargas().subscribe((data: any) => {
             this.spinRecargas = false;
             if (!data.bRta) return;
             this.listRecargas = data.data;
             this.listRecargas.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
-                this.totalRecargasRealizadas += Number(element.valor_recarga);
             });
         })
     }
@@ -403,7 +357,6 @@ export class TiendaOnlineComponent implements OnInit {
         let fechaFinal = this.rangoFechasRecargas[1] != null ? this.formatDate(this.rangoFechasRecargas[1]) : null;
         if (fechaInicial == null) return;
         if (fechaFinal == null) fechaFinal = fechaInicial;
-        this.totalRecargasRealizadas = 0;
         this.listRecargas = [];
         this.tiendaService.getRecargasFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinRecargasTotalizadas = false;
@@ -414,7 +367,6 @@ export class TiendaOnlineComponent implements OnInit {
             this.listRecargas = data.data;
             this.listRecargas.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
-                this.totalRecargasRealizadas += Number(element.valor_recarga);
             });
         })
     }
@@ -514,9 +466,6 @@ export class TiendaOnlineComponent implements OnInit {
         this.compraPorPersonaSelected = compraPorPersona;
         this.listDetalleVenta = [];
         this.spinDetalleVenta = true;
-        this.totalValorVentaDetalle = 0;
-        this.totalCostoDetalle = 0;
-        this.totalUtilidadDetalle = 0;
         this.tiendaService.getDetalleVenta(compraPorPersona.nombre_persona, compraPorPersona.nombre_producto).subscribe((data: any) => {
             this.spinDetalleVenta = false;
             if (!data.bRta) return;
@@ -525,9 +474,6 @@ export class TiendaOnlineComponent implements OnInit {
                 element.valor_venta = Number(element.valor_venta);
                 element.costo_producto = Number(element.costo_producto);
                 element.utilidad = Number(element.utilidad);
-                this.totalValorVentaDetalle += element.valor_venta;
-                this.totalCostoDetalle += element.costo_producto;
-                this.totalUtilidadDetalle += element.utilidad;
             });
         })
     }
@@ -539,9 +485,6 @@ export class TiendaOnlineComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.listDetalleVenta = [];
         this.spinDetalleVenta = true;
-        this.totalValorVentaDetalle = 0;
-        this.totalCostoDetalle = 0;
-        this.totalUtilidadDetalle = 0;
         this.tiendaService.getDetalleVentaFiltro(this.compraPorPersonaSelected.nombre_persona, this.compraPorPersonaSelected.nombre_producto, fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinDetalleVenta = false;
             if (!data.bRta) return;
@@ -550,9 +493,6 @@ export class TiendaOnlineComponent implements OnInit {
                 element.valor_venta = Number(element.valor_venta);
                 element.costo_producto = Number(element.costo_producto);
                 element.utilidad = Number(element.utilidad);
-                this.totalValorVentaDetalle += element.valor_venta;
-                this.totalCostoDetalle += element.costo_producto;
-                this.totalUtilidadDetalle += element.utilidad;
             });
         })
     }
@@ -782,7 +722,7 @@ export class TiendaOnlineComponent implements OnInit {
             const dateParts = tiendaOnline.fecha_transaccion.split("-");
             tiendaOnline.fecha_transaccion = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
             await lastValueFrom(this.tiendaService.newMovimientoTiendaOnline(tiendaOnline)).then((data: any) => { });
-            this.valueProgressBar = Math.round((contador*100)/dataSubir );
+            this.valueProgressBar = Math.round((contador * 100) / dataSubir);
             contador++;
         }
         this.spinIndicadores = false;
@@ -808,87 +748,67 @@ export class TiendaOnlineComponent implements OnInit {
         return num.toString().padStart(2, '0');
     }
 
-    filtroRecargas(filtro: string, columna: String) {
+    filtroRecargas(event, dt) {
         this.totalRecargasRealizadas = 0;
-        this.listRecargas.forEach(element => {
-            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
-                this.totalRecargasRealizadas += Number(element.valor_recarga);
-            }
-            if (columna == 'valor_recarga') {
-                if (Number(element[`${columna}`]) == Number(filtro)) {
-                    this.totalRecargasRealizadas += Number(element.valor_recarga);
-                }
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalRecargasRealizadas += Number(element.valor_recarga);
         });
     }
 
-    filtroProductos(filtro: string, columna: String) {
+    filtroProductos(event, dt) {
         this.totalProdVendidos = 0;
         this.cantProdVendidos = 0;
-        this.listProductosMasVendidos.forEach(element => {
-            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
-                this.totalProdVendidos += Number(element.total_venta);
-                this.cantProdVendidos += Number(element.cantidad);
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalProdVendidos += Number(element.total_venta);
+            this.cantProdVendidos += Number(element.cantidad);
         });
     }
 
-    filtroPersona(filtro: string, columna: String) {
+    filtroPersona(event, dt) {
         this.totalPersVendidos = 0;
         this.cantPersVendidos = 0;
-        this.listPersonasMasVentas.forEach(element => {
-            if (element[`${columna}`].includes(filtro)) {
-                this.totalPersVendidos += Number(element.total_venta);
-                this.cantPersVendidos += Number(element.cantidad);
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalPersVendidos += Number(element.total_venta);
+            this.cantPersVendidos += Number(element.cantidad);
         });
     }
 
-    filtroProdPerson(filtro: string, columna: String) {
+    filtroProdPerson(event, dt) {
         this.cantVentasPerProd = 0;
         this.totalUnitarioPerProd = 0;
         this.totalGenePerProd = 0;
         this.totalCostPerProd = 0;
         this.totalUtilPerProd = 0;
-        this.listVentasPorPersona.forEach(element => {
-            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
-                element.cantidad_ventas = Number(element.cantidad_ventas);
-                element.valor_unitario = Number(element.valor_unitario);
-                element.valor_total = Number(element.valor_total);
-                element.costo = Number(element.costo);
-                element.utilidad = Number(element.utilidad);
-                this.cantVentasPerProd += element.cantidad_ventas;
-                this.totalUnitarioPerProd += element.valor_unitario;
-                this.totalGenePerProd += element.valor_total;
-                this.totalCostPerProd += element.costo;
-                this.totalUtilPerProd += element.utilidad;
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.cantVentasPerProd += Number(element.cantidad_ventas);
+            this.totalUnitarioPerProd += Number(element.valor_unitario);
+            this.totalGenePerProd += Number(element.valor_total);
+            this.totalCostPerProd += Number(element.costo);
+            this.totalUtilPerProd += Number(element.utilidad);
         });
     }
 
-    filtroDetalleVenta(filtro: string, columna: String) {
+    filtroDetalleVenta(event, dt) {
         this.totalValorVentaDetalle = 0;
         this.totalCostoDetalle = 0;
         this.totalUtilidadDetalle = 0;
-        this.listDetalleVenta.forEach(element => {
-            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
-                element.valor_venta = Number(element.valor_venta);
-                element.costo_producto = Number(element.costo_producto);
-                element.utilidad = Number(element.utilidad);
-                this.totalValorVentaDetalle += element.valor_venta;
-                this.totalCostoDetalle += element.costo_producto;
-                this.totalUtilidadDetalle += element.utilidad;
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalValorVentaDetalle += Number(element.valor_venta);
+            this.totalCostoDetalle += Number(element.costo_producto);
+            this.totalUtilidadDetalle += Number(element.utilidad);
         });
     }
 
-    filtroComisiones(filtro: string, columna: String) {
+    filtroComisiones(event, dt) {
         this.cantTotalComisiones = 0;
-        this.listComisiones.forEach(element => {
-            if (element[`${columna}`].toLowerCase().includes(filtro.toLowerCase())) {
-                element.comisiones = Number(element.comisiones);
-                this.cantTotalComisiones += element.comisiones;
-            }
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.cantTotalComisiones += Number(element.comisiones);
         });
     }
 

@@ -143,6 +143,7 @@ import { AccessComponent } from './components/access/access.component';
 import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { NgImageFullscreenViewModule } from 'ng-image-fullscreen-view';
+import { RecargasComponent } from './pages/recargas/recargas.component';
 @NgModule({
     imports: [
         BrowserModule,
@@ -277,6 +278,7 @@ import { NgImageFullscreenViewModule } from 'ng-image-fullscreen-view';
         NotfoundComponent,
         AccessComponent,
         TiendaOnlineComponent,
+        RecargasComponent,
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },

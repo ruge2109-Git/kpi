@@ -1,0 +1,575 @@
+<p-toast></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12">
+    <div class="card">
+      <h5>Seleccione los archivos - SalesReport </h5>
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event)" multiple="multiple" accept=".csv" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      </p-fileUpload>
+    </div>
+
+    <div class="mb-4" *ngIf="showProgressBar">
+      <h5>Barra de progreso</h5>
+      <p-progressBar [value]="valueProgressBar"></p-progressBar>
+    </div>
+  </div>
+
+</div>
+<div class="grid">
+  <div class="col-12 xl:col-6">
+    <div class="card">
+      <h5>Recargas por cliente y canal</h5>
+      <p-table [loading]="spinRecargasClienteCanal" #tableClientesCanal [value]="listRecargasClienteCanal" dataKey="code" [rows]="5" (onFilter)="filtroClientesCanal($event,tableClientesCanal)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','canal','fecha','cantidad','valor']">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableClientesCanal)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="cliente">Cliente
+              <p-sortIcon field="cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="canal">Canal
+              <p-sortIcon field="canal"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cantidad">Cantidad
+              <p-sortIcon field="cantidad"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Total en valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+            <th></th>
+          </tr>
+          <tr>
+            <th>
+              <p-columnFilter type="text" field="cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="canal"></p-columnFilter>
+            </th>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasClientesCanal"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getClientesCanalPorFecha()"></button>
+              </div>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.cliente}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.canal}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.cantidad}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+            <td class="flex justify-content-center flex-column sm:flex-row">
+              <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data,null,null,'cliente')" class="ml-3"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="3">Total</td>
+            <td>{{totalCantidadClientesCanal }}</td>
+            <td>{{totalValorClientesCanal | currency:'$'}}</td>
+            <td></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="col-12 xl:col-6">
+    <div class="card">
+      <h5>Recargas por cliente y operador</h5>
+      <p-table [loading]="spinRecargasClienteOperador" #tableClientesOperador [value]="listRecargasClienteOperador" dataKey="code" [rows]="5" (onFilter)="filtroClientesOperador($event,tableClientesOperador)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','operador','fecha','cantidad','valor']">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableClientesOperador)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="cliente">Cliente
+              <p-sortIcon field="cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="operador">Operador
+              <p-sortIcon field="operador"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cantidad">Cantidad
+              <p-sortIcon field="cantidad"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Total en valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+            <th></th>
+          </tr>
+          <tr>
+            <th>
+              <p-columnFilter type="text" field="cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="operador"></p-columnFilter>
+            </th>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasClientesOperador"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getClientesOperadorPorFecha()"></button>
+              </div>
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.cliente}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.operador}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.cantidad}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+            <td class="flex justify-content-center flex-column sm:flex-row">
+              <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data,null,null,'cliente')" class="ml-3"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="3">Total</td>
+            <td>{{totalCantidadClientesOperador }}</td>
+            <td>{{totalValorClientesOperador | currency:'$'}}</td>
+            <td></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-12 md:col-6 lg:col-6 xl:col-6">
+      <div class="card">
+        <h5>Top ventas por canal</h5>
+        <p-table [loading]="spinTopCanal" #tableTopCanal [value]="listTopCanal" [rows]="5" (onFilter)="filtroTopCanal($event,tableTopCanal)" [paginator]="true" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['canal','fecha','cantidad','valor']">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableTopCanal)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="canal">Canal
+                <p-sortIcon field="canal"></p-sortIcon>
+              </th>
+              <th pSortableColumn="fecha">Fecha
+                <p-sortIcon field="fecha"></p-sortIcon>
+              </th>
+              <th pSortableColumn="cantidad">Cantidad
+                <p-sortIcon field="cantidad"></p-sortIcon>
+              </th>
+              <th pSortableColumn="valor">Total en valor
+                <p-sortIcon field="valor"></p-sortIcon>
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>
+                <p-columnFilter type="text" field="canal"></p-columnFilter>
+              </th>
+              <th>
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                  <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasTopCanal"></p-calendar>
+                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getTopCanalFechas()"></button>
+                </div>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data>
+            <tr>
+              <td style="min-width: 12rem;">
+                {{data.canal}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.fecha | date:'dd-MM-yyyy'}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.cantidad}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.valor | currency:'$'}}
+              </td>
+              <td class="flex justify-content-center flex-column sm:flex-row">
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-3" (click)="getDetalleRecarga(null,data,null,'canal')"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="2">Total</td>
+              <td>{{totalCantidadTopCanal }}</td>
+              <td>{{totalVentasTopCanal | currency:'$'}}</td>
+              <td></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">Sin registros</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="8">Cargando información, por favor espere</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6 lg:col-6 xl:col-6">
+      <div class="card">
+        <h5>Top ventas por operador</h5>
+        <p-table [loading]="spinTopOperador" #tableTopOperador [value]="listTopOperador" [rows]="5" (onFilter)="filtroTopOperador($event,tableTopOperador)" [paginator]="true" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['operador','fecha','cantidad','valor']">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableTopOperador)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="operador">Operador
+                <p-sortIcon field="operador"></p-sortIcon>
+              </th>
+              <th pSortableColumn="fecha">Fecha
+                <p-sortIcon field="fecha"></p-sortIcon>
+              </th>
+              <th pSortableColumn="cantidad">Cantidad
+                <p-sortIcon field="cantidad"></p-sortIcon>
+              </th>
+              <th pSortableColumn="valor">Total en valor
+                <p-sortIcon field="valor"></p-sortIcon>
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>
+                <p-columnFilter type="text" field="operador"></p-columnFilter>
+              </th>
+              <th>
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                  <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasTopOperador"></p-calendar>
+                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getTopOperadorFechas()"></button>
+                </div>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data>
+            <tr>
+              <td style="min-width: 12rem;">
+                {{data.operador}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.fecha | date:'dd-MM-yyyy'}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.cantidad}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.valor | currency:'$'}}
+              </td>
+              <td class="flex justify-content-center flex-column sm:flex-row">
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-3"  (click)="getDetalleRecarga(null,null,data,'operador')"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="2">Total</td>
+              <td>{{totalCantidadTopOperador }}</td>
+              <td>{{totalVentasTopOperador | currency:'$'}}</td>
+              <td></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">Sin registros</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="8">Cargando información, por favor espere</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6 lg:col-12 xl:col-8 xl:col-offset-2">
+      <div class="card">
+        <h5>Top ventas por cliente</h5>
+        <p-table [loading]="spinTopCliente" #tableTopCliente [value]="listTopCliente" [rows]="5" (onFilter)="filtroTopCliente($event,tableTopCliente)" [paginator]="true" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','fecha','cantidad','valor']">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableTopCliente)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="cliente">Cliente
+                <p-sortIcon field="cliente"></p-sortIcon>
+              </th>
+              <th pSortableColumn="fecha">Fecha
+                <p-sortIcon field="fecha"></p-sortIcon>
+              </th>
+              <th pSortableColumn="cantidad">Cantidad
+                <p-sortIcon field="cantidad"></p-sortIcon>
+              </th>
+              <th pSortableColumn="valor">Total en valor
+                <p-sortIcon field="valor"></p-sortIcon>
+              </th>
+              <th></th>
+            </tr>
+            <tr>
+              <th>
+                <p-columnFilter type="text" field="cliente"></p-columnFilter>
+              </th>
+              <th>
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                  <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasTopCliente"></p-calendar>
+                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getTopClientesFechas()"></button>
+                </div>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data>
+            <tr>
+              <td style="min-width: 12rem;">
+                {{data.cliente}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.fecha | date:'dd-MM-yyyy'}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.cantidad}}
+              </td>
+              <td style="min-width: 12rem;">
+                {{data.valor | currency:'$'}}
+              </td>
+              <td class="flex justify-content-center flex-column sm:flex-row">
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-3" (click)="getDetalleRecarga(data,null,null,'cliente')"></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td colspan="2">Total</td>
+              <td>{{totalCantidadTopCliente }}</td>
+              <td>{{totalVentasTopCliente | currency:'$'}}</td>
+              <td></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">Sin registros</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="8">Cargando información, por favor espere</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 xl:col-12">
+    <div class="card">
+      <h5>Recargas por detalle</h5>
+      <p-table [loading]="spinRecargasCliente" #tableRecargasCliente [value]="listRecargasCliente" dataKey="code" [rows]="5" (onFilter)="filtroClientesRecargas($event,tableRecargasCliente)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','canal','operador','bolsa','fecha','hora','estado','comision','linea','valor']">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRecargasCliente)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="cliente">Cliente
+              <p-sortIcon field="cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="canal">Canal
+              <p-sortIcon field="canal"></p-sortIcon>
+            </th>
+            <th pSortableColumn="operador">Operador
+              <p-sortIcon field="operador"></p-sortIcon>
+            </th>
+            <th pSortableColumn="bolsa">Bolsa
+              <p-sortIcon field="bolsa"></p-sortIcon>
+            </th>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="hora">hora
+              <p-sortIcon field="hora"></p-sortIcon>
+            </th>
+            <th pSortableColumn="estado">estado
+              <p-sortIcon field="estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="comision">Comisión
+              <p-sortIcon field="comision"></p-sortIcon>
+            </th>
+            <th pSortableColumn="linea">Línea
+              <p-sortIcon field="linea"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <p-columnFilter type="text" field="cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="canal"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="operador"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="bolsa"></p-columnFilter>
+            </th>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasClientesRecargas"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getTopClientesFechas()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="hora"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="comision"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="linea"></p-columnFilter>
+            </th>
+            <th></th>
+
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.cliente}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.canal}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.operador}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.bolsa}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.hora}}
+            </td>
+            <td style="min-width: 12rem;">
+              <span class="{{data.estado}}">{{data.estado}}</span>
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.comision}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.linea}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="9">Total</td>
+            <td>{{totalVentasClientesRecargas | currency:'$' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="10">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

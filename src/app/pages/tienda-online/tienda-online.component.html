@@ -143,7 +143,7 @@
           <div class="col-12">
             <div class="card">
               <h5>Recargas realizadas</h5>
-              <p-table [loading]="spinRecargas" #tableRecargas [value]="listRecargas" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['administrador','cliente','valor_recarga','fecha_recarga']">
+              <p-table [loading]="spinRecargas" #tableRecargas [value]="listRecargas" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll" (onFilter)="filtroRecargas($event, tableRecargas)" [globalFilterFields]="['administrador','cliente','valor_recarga','fecha_recarga']">
                 <ng-template pTemplate="caption">
                   <div class="flex justify-content-between flex-column sm:flex-row">
                     <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRecargas)"></button>
@@ -167,10 +167,10 @@
                   </tr>
                   <tr>
                     <th>
-                      <p-columnFilter type="text" field="administrador" (change)="filtroRecargas($event.target.value,'administrador')"></p-columnFilter>
+                      <p-columnFilter type="text" field="administrador"></p-columnFilter>
                     </th>
                     <th>
-                      <p-columnFilter type="text" field="cliente" (change)="filtroRecargas($event.target.value,'cliente')"></p-columnFilter>
+                      <p-columnFilter type="text" field="cliente"></p-columnFilter>
                     </th>
                     <th>
                     </th>
@@ -203,6 +203,7 @@
                     <td class="flex justify-content-center flex-column sm:flex-row">
                       <button type="button" pButton pRipple icon="pi pi-file" (click)="verArchivosRecarga(data)" [ngClass]="{'p-button-outlined': data.tiene_archivos == 0}"></button>
                       <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)" class="ml-3"></button>
+
                     </td>
                   </tr>
                 </ng-template>
@@ -285,7 +286,7 @@
         </div>
         <div class="card">
           <h5>Comisiones</h5>
-          <p-table [loading]="spinDetalleRecarga" #tableComisiones [value]="listComisiones" dataKey="code" [rows]="4" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['usuario_vendedor','producto']">
+          <p-table [loading]="spinDetalleRecarga" #tableComisiones [value]="listComisiones" dataKey="code" [rows]="4" [paginator]="true" responsiveLayout="scroll" (onFilter)="filtroComisiones($event,tableComisiones)" [globalFilterFields]="['usuario_vendedor','producto']">
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisiones)"></button>
@@ -308,7 +309,7 @@
               </tr>
               <tr>
                 <th>
-                  <p-columnFilter type="text" field="usuario_vendedor" (change)="filtroComisiones($event.target.value,'usuario_vendedor')"></p-columnFilter>
+                  <p-columnFilter type="text" field="usuario_vendedor" ></p-columnFilter>
                 </th>
                 <th>
                   <div class="flex justify-content-between flex-column sm:flex-row">
@@ -317,7 +318,7 @@
                   </div>
                 </th>
                 <th>
-                  <p-columnFilter type="text" field="producto" (change)="filtroComisiones($event.target.value,'producto')"></p-columnFilter>
+                  <p-columnFilter type="text" field="producto"></p-columnFilter>
                 </th>
                 <th>
                 </th>
@@ -374,7 +375,7 @@
       <div class="col-12 xl:col-6">
         <div class="card">
           <h5>Ventas por producto</h5>
-          <p-table [loading]="spinVentasProducto" #tableVXP [value]="listProductosMasVendidos" dataKey="code" selectionMode="single" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_producto','fecha_transaccion']">
+          <p-table [loading]="spinVentasProducto" #tableVXP [value]="listProductosMasVendidos" dataKey="code" (onFilter)="filtroProductos($event,tableVXP)" selectionMode="single" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_producto','fecha_transaccion']">
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableVXP)"></button>
@@ -409,7 +410,7 @@
               </tr>
               <tr>
                 <th>
-                  <p-columnFilter type="text" field="nombre_producto" (change)="filtroProductos($event.target.value,'nombre_producto')"></p-columnFilter>
+                  <p-columnFilter type="text" field="nombre_producto"></p-columnFilter>
                 </th>
                 <th>
                   <div class="flex justify-content-between flex-column sm:flex-row">
@@ -465,7 +466,7 @@
       <div class="col-12 xl:col-6">
         <div class="card">
           <h5>Ventas por persona</h5>
-          <p-table [loading]="spinVentasPersona" #tableVentasXPersona [value]="listPersonasMasVentas" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_persona']">
+          <p-table [loading]="spinVentasPersona" #tableVentasXPersona [value]="listPersonasMasVentas" [rows]="5" (onFilter)="filtroPersona($event,tableVentasXPersona)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_persona']">
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableVentasXPersona)"></button>
@@ -500,7 +501,7 @@
               </tr>
               <tr>
                 <th>
-                  <p-columnFilter type="text" field="nombre_persona" (change)="filtroPersona($event.target.value,'nombre_persona')"></p-columnFilter>
+                  <p-columnFilter type="text" field="nombre_persona"></p-columnFilter>
                 </th>
                 <th>
                   <div class="flex justify-content-between flex-column sm:flex-row">
@@ -557,7 +558,7 @@
       <div class="col-12 xl:col-12">
         <div class="card">
           <h5>Ventas por persona y producto</h5>
-          <p-table [loading]="spinVentaPersonaProducto" #tableVentasYProducto [value]="listVentasPorPersona" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_persona','nombre_producto','cantidad_ventas','valor_unitario','total_vendido','costo','utilidad']">
+          <p-table [loading]="spinVentaPersonaProducto" #tableVentasYProducto [value]="listVentasPorPersona" [rows]="5" (onFilter)="filtroProdPerson($event,tableVentasYProducto)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['nombre_persona','nombre_producto','cantidad_ventas','valor_unitario','total_vendido','costo','utilidad']">
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableVentasYProducto)"></button>
@@ -617,10 +618,10 @@
               </tr>
               <tr>
                 <th>
-                  <p-columnFilter type="text" field="nombre_persona" (change)="filtroProdPerson($event.target.value,'nombre_persona')"></p-columnFilter>
+                  <p-columnFilter type="text" field="nombre_persona" ></p-columnFilter>
                 </th>
                 <th>
-                  <p-columnFilter type="text" field="nombre_producto" (change)="filtroProdPerson($event.target.value,'nombre_producto')"></p-columnFilter>
+                  <p-columnFilter type="text" field="nombre_producto" ></p-columnFilter>
                 </th>
                 <th>
                   <div class="flex justify-content-end flex-column sm:flex-row">
@@ -701,7 +702,7 @@
       <div class="col-12 xl:col-12">
         <div class="card">
           <h5>Detalle de venta</h5>
-          <p-table [loading]="spinDetalleVenta" #tableDetalleVenta [value]="listDetalleVenta" [rows]="5" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['usuario_vendedor','usuario_cliente','producto','fecha_transaccion','valor_venta','costo_producto','utilidad']">
+          <p-table [loading]="spinDetalleVenta" #tableDetalleVenta [value]="listDetalleVenta" [rows]="5" [paginator]="true" (onFilter)="filtroDetalleVenta($event,tableDetalleVenta)" responsiveLayout="scroll" [globalFilterFields]="['usuario_vendedor','usuario_cliente','producto','fecha_transaccion','valor_venta','costo_producto','utilidad']">
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableDetalleVenta)"></button>
@@ -754,13 +755,13 @@
               </tr>
               <tr>
                 <th>
-                  <p-columnFilter type="text" field="nombre_persona" (change)="filtroProdPerson($event.target.value,'usuario_vendedor')"></p-columnFilter>
+                  <p-columnFilter type="text" field="usuario_vendedor"></p-columnFilter>
                 </th>
                 <th>
-                  <p-columnFilter type="text" field="nombre_producto" (change)="filtroProdPerson($event.target.value,'usuario_cliente')"></p-columnFilter>
+                  <p-columnFilter type="text" field="usuario_cliente" ></p-columnFilter>
                 </th>
                 <th>
-                  <p-columnFilter type="text" field="nombre_producto" (change)="filtroProdPerson($event.target.value,'producto')"></p-columnFilter>
+                  <p-columnFilter type="text" field="producto" ></p-columnFilter>
                 </th>
                 <th>
                   <div class="flex justify-content-end flex-column sm:flex-row">

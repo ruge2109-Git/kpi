@@ -29,6 +29,7 @@ import { ErrorComponent } from './components/error/error.component';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { AccessComponent } from './components/access/access.component';
 import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.component';
+import { RecargasComponent } from './pages/recargas/recargas.component';
 @NgModule({
     imports: [
         RouterModule.forRoot([
@@ -61,6 +62,7 @@ import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.compo
                     { path: 'blocks', component: BlocksComponent },
                     { path: 'documentation', component: DocumentationComponent },
                     { path: 'tiendaOnline', component: TiendaOnlineComponent },
+                    { path: 'recargas', component: RecargasComponent },
                 ],
             },
             { path: 'pages/landing', component: LandingComponent },

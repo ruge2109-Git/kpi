@@ -23,8 +23,8 @@ export class AppMenuComponent implements OnInit {
     constructor(public appMain: AppMainComponent) { }
 
     ngOnInit() {
-        this.initModelQA();
-        // this.initModelProd();
+        // this.initModelQA();
+        this.initModelProd();
     }
 
     initModelQA() {
@@ -151,6 +151,7 @@ export class AppMenuComponent implements OnInit {
                 label: 'Aplicaciones',
                 items: [
                     { label: 'Tienda online', icon: 'pi pi-fw pi-desktop', routerLink: ['/tiendaOnline'] },
+                    { label: 'Recargas', icon: 'pi pi-fw pi-desktop', routerLink: ['/recargas'] },
                 ]
             }
         ];
