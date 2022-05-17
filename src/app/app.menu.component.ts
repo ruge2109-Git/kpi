@@ -156,7 +156,8 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-desktop',
                         items: [
                             { label: 'Consolidado de ventas', icon: 'pi pi-fw pi-desktop', routerLink: ['/recargas'] },
-                            { label: 'Repartos detallado', icon: 'pi pi-fw pi-desktop', routerLink: ['/extractos'] },
+                            { label: 'Extracto mi ahorro', icon: 'pi pi-fw pi-desktop', routerLink: ['/ctaAhorro'] },
+                            // { label: 'Repartos detallado', icon: 'pi pi-fw pi-desktop', routerLink: ['/extractos'] },
 
                         ]
                     },

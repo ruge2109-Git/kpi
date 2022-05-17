@@ -145,6 +145,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { NgImageFullscreenViewModule } from 'ng-image-fullscreen-view';
 import { RecargasComponent } from './pages/recargas/recargas.component';
 import { ExtractosComponent } from './pages/extractos/extractos.component';
+import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
 @NgModule({
     imports: [
         BrowserModule,
@@ -281,6 +282,7 @@ import { ExtractosComponent } from './pages/extractos/extractos.component';
         TiendaOnlineComponent,
         RecargasComponent,
         ExtractosComponent,
+        CtaAhorroComponent,
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },
