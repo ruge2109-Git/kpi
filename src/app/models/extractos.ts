@@ -1,0 +1,30 @@
+export interface EX_Informe_reparto {
+    cod_informe_reparto?: number;
+    consecutivo: number;
+    tipo_informe: string;
+    id_cliente: number;
+    cliente: string;
+    solicitante: string;
+    valor_compra: number;
+    valor_comision: number;
+    valor_acreditado: number;
+    tipo_movimiento: string;
+    fecha_aprobacion: string;
+    hora_aprobacion: string;
+    fecha_deposito: string;
+    hora_deposito: string;
+    num_reparto: string;
+    tarjeta_recaudo: string;
+    banco: string;
+    pdc: string;
+    detalle_pdf: string;
+    cuenta: string;
+    num_comprobante: string;
+    num_CashOut: string;
+    tipo: string;
+    usuario_responsable: string;
+    fecha_registro: string;
+    hora_registro: string;
+    observacion: string;
+    modo: string
+}

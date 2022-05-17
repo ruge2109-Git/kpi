@@ -360,7 +360,7 @@
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-12 xl:col-8 xl:col-offset-2">
+    <div class="col-12 md:col-6 lg:col-12 xl:col-6">
       <div class="card">
         <h5>Top ventas por cliente</h5>
         <p-table [loading]="spinTopCliente" #tableTopCliente [value]="listTopCliente" [rows]="5" (onFilter)="filtroTopCliente($event,tableTopCliente)" [paginator]="true" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','fecha','cantidad','valor']">
@@ -440,6 +440,88 @@
         </p-table>
       </div>
     </div>
+
+    <div class="col-12 md:col-6 lg:col-12 xl:col-6">
+        <div class="card">
+          <h5>Top ventas por comisión</h5>
+          <p-table [loading]="spinTopComision" #tableTopComision [value]="listTopComision" [rows]="5" [paginator]="true" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['cliente','fecha','cantidad','valor']">
+            <ng-template pTemplate="caption">
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableTopComision)"></button>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="cliente">Cliente
+                  <p-sortIcon field="cliente"></p-sortIcon>
+                </th>
+                <th pSortableColumn="fecha">Fecha
+                  <p-sortIcon field="fecha"></p-sortIcon>
+                </th>
+                <th pSortableColumn="comision">Comisión
+                  <p-sortIcon field="comision"></p-sortIcon>
+                </th>
+                <th pSortableColumn="bolsa">Bolsa
+                  <p-sortIcon field="bolsa"></p-sortIcon>
+                </th>
+                <th pSortableColumn="operador">Operador
+                  <p-sortIcon field="operador"></p-sortIcon>
+                </th>
+                <th></th>
+              </tr>
+              <tr>
+                <th>
+                  <p-columnFilter type="text" field="cliente"></p-columnFilter>
+                </th>
+                <th>
+                  <div class="flex justify-content-between flex-column sm:flex-row">
+                    <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasTopComisiones"></p-calendar>
+                    <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getTopComisionesFechas()"></button>
+                  </div>
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-data>
+              <tr>
+                <td style="min-width: 12rem;">
+                  {{data.cliente}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.fecha | date:'dd-MM-yyyy'}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.comision}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.bolsa}}
+                </td>
+                <td style="min-width: 12rem;">
+                  {{data.operador}}
+                </td>
+                <td class="flex justify-content-center flex-column sm:flex-row">
+                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-3" (click)="getDetalleRecarga(data,null,null,'cliente')"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8">Sin registros</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="loadingbody">
+              <tr>
+                <td colspan="8">Cargando información, por favor espere</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+
   </div>
 
   <div class="col-12 xl:col-12">

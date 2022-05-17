@@ -77,4 +77,12 @@ export class RecargasService {
         return this.http.get(`${this.url}/sales_report/topClienteFechas/${fechaIni}/${fechaFin}`);
     }
 
+    getTopComisiones() {
+        return this.http.get(`${this.url}/sales_report/topComision`);
+    }
+
+    getTopComisionesFechas(fechaIni:string,fechaFin:string) {
+        return this.http.get(`${this.url}/sales_report/topComisionFechas/${fechaIni}/${fechaFin}`);
+    }
+
 }

@@ -1,0 +1,15 @@
+<p-toast></p-toast>
+<div class="grid">
+  <div class="col-12 md:col-12">
+    <div class="card">
+      <h5>Seleccione los archivos </h5>
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event)" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      </p-fileUpload>
+    </div>
+
+    <div class="mb-4" *ngIf="showProgressBar">
+      <h5>Barra de progreso</h5>
+      <p-progressBar [value]="valueProgressBar"></p-progressBar>
+    </div>
+  </div>
+</div>

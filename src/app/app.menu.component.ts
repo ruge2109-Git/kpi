@@ -150,8 +150,16 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Aplicaciones',
                 items: [
-                    { label: 'Tienda online', icon: 'pi pi-fw pi-desktop', routerLink: ['/tiendaOnline'] },
-                    { label: 'Recargas', icon: 'pi pi-fw pi-desktop', routerLink: ['/recargas'] },
+                    { label: 'Tu diversión', icon: 'pi pi-fw pi-desktop', routerLink: ['/tiendaOnline'] },
+                    {
+                        label: 'Recargas Bemovil',
+                        icon: 'pi pi-fw pi-desktop',
+                        items: [
+                            { label: 'Consolidado de ventas', icon: 'pi pi-fw pi-desktop', routerLink: ['/recargas'] },
+                            { label: 'Repartos detallado', icon: 'pi pi-fw pi-desktop', routerLink: ['/extractos'] },
+
+                        ]
+                    },
                 ]
             }
         ];

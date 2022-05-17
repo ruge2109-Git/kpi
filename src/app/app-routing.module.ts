@@ -30,6 +30,7 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
 import { AccessComponent } from './components/access/access.component';
 import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.component';
 import { RecargasComponent } from './pages/recargas/recargas.component';
+import { ExtractosComponent } from './pages/extractos/extractos.component';
 @NgModule({
     imports: [
         RouterModule.forRoot([
@@ -63,6 +64,7 @@ import { RecargasComponent } from './pages/recargas/recargas.component';
                     { path: 'documentation', component: DocumentationComponent },
                     { path: 'tiendaOnline', component: TiendaOnlineComponent },
                     { path: 'recargas', component: RecargasComponent },
+                    { path: 'extractos', component: ExtractosComponent },
                 ],
             },
             { path: 'pages/landing', component: LandingComponent },

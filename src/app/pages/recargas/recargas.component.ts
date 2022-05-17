@@ -24,6 +24,7 @@ export class RecargasComponent implements OnInit {
     public listTopCanal: SR_top_canal[] = [];
     public listTopOperador: SR_top_operador[] = [];
     public listTopCliente: SR_top_cliente[] = [];
+    public listTopComision: Sales_report[] = [];
 
     public recargaSeleccionada: Sales_report;
     public canalSeleccionado: SR_top_canal;
@@ -38,6 +39,7 @@ export class RecargasComponent implements OnInit {
     spinTopCanal: boolean = false;
     spinTopOperador: boolean = false;
     spinTopCliente: boolean = false;
+    spinTopComision: boolean = false;
 
     //Progreso
     showProgressBar: boolean = false;
@@ -50,6 +52,7 @@ export class RecargasComponent implements OnInit {
     rangoFechasTopCanal: Date[] = [];
     rangoFechasTopOperador: Date[] = [];
     rangoFechasTopCliente: Date[] = [];
+    rangoFechasTopComisiones: Date[] = [];
 
     //Vista
     @ViewChild('tableClientesCanal') tableClientesCanal: Table;
@@ -58,6 +61,7 @@ export class RecargasComponent implements OnInit {
     @ViewChild('tableTopCanal') tableTopCanal: Table;
     @ViewChild('tableTopOperador') tableTopOperador: Table;
     @ViewChild('tableTopCliente') tableTopCliente: Table;
+    @ViewChild('tableTopComision') tableTopComision: Table;
 
     //Totalizado
     totalCantidadClientesCanal: number = 0;
@@ -87,6 +91,7 @@ export class RecargasComponent implements OnInit {
         this.getTopCanal();
         this.getTopOperador();
         this.getTopCliente();
+        this.getTopComisiones();
     }
 
     getSalesReport() {
@@ -228,7 +233,18 @@ export class RecargasComponent implements OnInit {
         })
     }
 
-
+    getTopComisiones() {
+        this.spinTopComision = true;
+        this.salesReportService.getTopComisiones().subscribe((data: any) => {
+            this.spinTopComision = false;
+            if (!data.bRta) return;
+            this.listTopComision = data.data;
+            this.listTopComision.forEach(element => {
+                element.valor = Number(element.valor);
+                element.comision = Number(element.comision);
+            });
+        })
+    }
 
     async onUpload(event) {
         for (const file of event.files) {
@@ -271,7 +287,7 @@ export class RecargasComponent implements OnInit {
     }
 
     getHeaderArray(csvRecordsArr: any) {
-        let headers = (<string>csvRecordsArr[0]).split(';');
+        let headers = (<string>csvRecordsArr[0]).split(',');
         let headerArray = [];
         for (let j = 0; j < headers.length; j++) {
             headerArray.push(headers[j]);
@@ -283,7 +299,7 @@ export class RecargasComponent implements OnInit {
         let csvArr = [];
 
         for (let i = 1; i < csvRecordsArray.length; i++) {
-            let curruntRecord = (<string>csvRecordsArray[i]).split(';');
+            let curruntRecord = (<string>csvRecordsArray[i]).split(',');
             if (curruntRecord.length == headerLength) {
                 let csvRecord: Sales_report = {
                     id_transaccion: curruntRecord[0].trim(),
@@ -449,6 +465,26 @@ export class RecargasComponent implements OnInit {
         })
     }
 
+    getTopComisionesFechas() {
+        let fechaInicial = this.rangoFechasTopComisiones[0] != null ? this.formatDate(this.rangoFechasTopComisiones[0]) : null;
+        let fechaFinal = this.rangoFechasTopComisiones[1] != null ? this.formatDate(this.rangoFechasTopComisiones[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listTopComision = [];
+        this.spinTopComision = true;
+        this.salesReportService.getTopComisionesFechas(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinTopComision = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango fechas indicadas' });
+                return;
+            };
+            this.listTopComision = data.data;
+            this.listTopComision.forEach(element => {
+                element.comision = Number(element.comision);
+            });
+        })
+    }
+
 
     //Totalizados
     filtroClientesCanal(event, dt) {
@@ -508,6 +544,7 @@ export class RecargasComponent implements OnInit {
             this.totalCantidadTopCliente += Number(element.cantidad);
         });
     }
+
 
     clear(table: Table) {
         table.clear();
