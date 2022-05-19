@@ -1,4 +1,6 @@
 <p-toast></p-toast>
+<h1 class="text-center">EXTRACTO DE AHORRO</h1>
+
 <div class="grid">
   <div class="col-12 md:col-12">
     <div class="card">
@@ -16,7 +18,7 @@
   <div class="col-12 md:col-10 md:col-offset-1">
     <div class="card">
       <h5>Indicadores</h5>
-      <p-table [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll">
+      <p-table [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" (onFilter)="filtroTotalizadoIndicadores($event,tableIngresos)" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIndicadores)"></button>
@@ -84,6 +86,26 @@
             </td>
           </tr>
         </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td>Total</td>
+            <td>{{totalSaldoInicialDia | currency:'$'}}</td>
+            <td>{{totalEntradas | currency:'$'}}</td>
+            <td>{{totalSalidas | currency:'$'}}</td>
+            <td>{{totalBalance | currency:'$'}}</td>
+            <td>{{totalSaldoFinaldia | currency:'$'}}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Promedio</td>
+            <td>{{promedioTotalSaldoInicialDia | currency:'$'}}</td>
+            <td>{{promedioTotalEntradas | currency:'$'}}</td>
+            <td>{{promedioTotalSalidas | currency:'$'}}</td>
+            <td>{{promedioTotalBalance | currency:'$'}}</td>
+            <td>{{promedioTotalSaldoFinaldia | currency:'$'}}</td>
+            <td></td>
+          </tr>
+        </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
             <td colspan="8">Sin registros</td>
@@ -101,8 +123,8 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Ingresos</h5>
-      <p-table [loading]="spinIngresos" #tableIngresos [value]="listIngresos" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoIngresos($event,tableIngresos)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']" [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinIngresos" #tableIngresos [value]="listIngresos" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoIngresos($event,tableIngresos)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIngresos)"></button>
@@ -189,11 +211,11 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
-            <tr>
-                <td colspan="4">Total valor</td>
-                <td>{{totalIngresos | currency:'$'}}</td>
-                <td colspan="4"></td>
-            </tr>
+          <tr>
+            <td colspan="4">Total valor</td>
+            <td>{{totalIngresos | currency:'$'}}</td>
+            <td colspan="4"></td>
+          </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage ">
           <tr>
@@ -212,8 +234,8 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Egresos</h5>
-      <p-table [loading]="spinIngresos" #tableEgresos [value]="listEgresos" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoEgresos($event,tableEgresos)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']" [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinIngresos" #tableEgresos [value]="listEgresos" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoEgresos($event,tableEgresos)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableEgresos)"></button>
@@ -300,11 +322,11 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
-            <tr>
-                <td colspan="4">Total valor</td>
-                <td>{{totalEgresos | currency:'$'}}</td>
-                <td colspan="4"></td>
-            </tr>
+          <tr>
+            <td colspan="4">Total valor</td>
+            <td>{{totalEgresos | currency:'$'}}</td>
+            <td colspan="4"></td>
+          </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage ">
           <tr>
@@ -323,8 +345,8 @@
   <div class="col-12 md:col-12">
     <div class="card">
       <h5>Sin comisiones</h5>
-      <p-table [loading]="spinSinComisiones" #tableSinComisiones [value]="listSinComisiones" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoComisiones($event,tableSinComisiones)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']" [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinSinComisiones" #tableSinComisiones [value]="listSinComisiones" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoComisiones($event,tableSinComisiones)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableSinComisiones)"></button>
@@ -425,11 +447,11 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
-            <tr>
-                <td colspan="5">Total valor</td>
-                <td>{{totalSinComisiones | currency:'$'}}</td>
-                <td colspan="4"></td>
-            </tr>
+          <tr>
+            <td colspan="5">Total valor</td>
+            <td>{{totalSinComisiones | currency:'$'}}</td>
+            <td colspan="4"></td>
+          </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage ">
           <tr>
@@ -448,8 +470,8 @@
   <div class="col-12 md:col-12">
     <div class="card">
       <h5>Detalle</h5>
-      <p-table [loading]="spinDetalle" #tableDetalle [value]="listExtractosDetalle" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoDetalle($event,tableDetalle)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']" [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinDetalle" #tableDetalle [value]="listExtractosDetalle" dataKey="code" [rows]="10" (onFilter)="filtroTotalizadoDetalle($event,tableDetalle)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','hora','descripcion','servicio','valor','usuario','cliente_responsable','cliente_afectado']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableDetalle)"></button>
@@ -550,11 +572,11 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="footer">
-            <tr>
-                <td colspan="5">Total valor</td>
-                <td>{{totalValorDetalle | currency:'$'}}</td>
-                <td colspan="4"></td>
-            </tr>
+          <tr>
+            <td colspan="5">Total valor</td>
+            <td>{{totalValorDetalle | currency:'$'}}</td>
+            <td colspan="4"></td>
+          </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage ">
           <tr>

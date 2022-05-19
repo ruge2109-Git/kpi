@@ -32,6 +32,7 @@ export class TiendaOnlineComponent implements OnInit {
 
     //Totalizados
     totalRecargasRealizadas: number = 0;
+    totalPromedioRecargasRealizadas: number = 0;
     totalRecargas: number = 0;
     cantProdVendidos: number = 0;
     totalProdVendidos: number = 0;
@@ -510,6 +511,7 @@ export class TiendaOnlineComponent implements OnInit {
                 break;
             case this.tableRecargas:
                 this.totalRecargasRealizadas = 0;
+                this.totalPromedioRecargasRealizadas = 0;
                 this.getRecargas();
                 this.rangoFechasRecargas = [];
                 break;
@@ -755,10 +757,18 @@ export class TiendaOnlineComponent implements OnInit {
 
     filtroRecargas(event, dt) {
         this.totalRecargasRealizadas = 0;
+        this.totalPromedioRecargasRealizadas = 0;
         let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
         dataFiltrada.forEach(element => {
             this.totalRecargasRealizadas += Number(element.valor_recarga);
+            if (!listaFechas.includes(element.fecha_recarga)) {
+                listaFechas.push(element.fecha_recarga);
+            }
         });
+        console.log(listaFechas);
+
+        this.totalPromedioRecargasRealizadas = this.totalRecargasRealizadas / (listaFechas.length == 0 ? 1 : listaFechas.length);
     }
 
     filtroProductos(event, dt) {

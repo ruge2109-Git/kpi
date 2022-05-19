@@ -66,3 +66,9 @@ export interface SR_Producto{
     tipo_comision :string;
     valor_comision: number;
 }
+
+export interface SR_Indicador{
+    fecha: string;
+    total: number;
+    promedio: number;
+}

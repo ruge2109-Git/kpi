@@ -57,6 +57,19 @@ export class CtaAhorroComponent implements OnInit {
     totalEgresos: number = 0;
     totalSinComisiones: number = 0;
 
+    totalSaldoInicialDia: number = 0;
+    totalEntradas: number = 0;
+    totalSalidas: number = 0;
+    totalBalance: number = 0;
+    totalSaldoFinaldia: number = 0;
+
+    promedioTotalSaldoInicialDia: number = 0;
+    promedioTotalEntradas: number = 0;
+    promedioTotalSalidas: number = 0;
+    promedioTotalBalance: number = 0;
+    promedioTotalSaldoFinaldia: number = 0;
+
+
 
     constructor(private messageService: MessageService, private extractoAhorroService: ExtractoAhorroService) { }
 
@@ -121,6 +134,16 @@ export class CtaAhorroComponent implements OnInit {
     getIndicadores() {
         this.spinIndicadores = true;
         this.listIndicadores = [];
+        this.totalSaldoInicialDia = 0;
+        this.totalEntradas = 0;
+        this.totalSalidas = 0;
+        this.totalBalance = 0;
+        this.totalSaldoFinaldia = 0;
+        this.promedioTotalSaldoInicialDia = 0;
+        this.promedioTotalEntradas = 0;
+        this.promedioTotalSalidas = 0;
+        this.promedioTotalBalance = 0;
+        this.promedioTotalSaldoFinaldia = 0;
         this.extractoAhorroService.getIndicadores().subscribe((data: any) => {
             this.spinIndicadores = false;
             if (!data.bRta) {
@@ -133,7 +156,18 @@ export class CtaAhorroComponent implements OnInit {
                 element.entradas = Number(element.entradas);
                 element.salidas = Number(element.salidas);
                 element.saldo_final = Number(element.saldo_final);
+                element.diferencia = Number(element.diferencia);
+                this.totalSaldoInicialDia += element.saldo_anterior;
+                this.totalEntradas += element.entradas;
+                this.totalSalidas += element.salidas;
+                this.totalBalance += element.diferencia;
+                this.totalSaldoFinaldia += element.saldo_final;
             });
+            this.promedioTotalSaldoInicialDia = this.totalSaldoInicialDia / this.listIndicadores.length;
+            this.promedioTotalEntradas = this.totalEntradas / this.listIndicadores.length;
+            this.promedioTotalSalidas = this.totalSalidas / this.listIndicadores.length;
+            this.promedioTotalBalance = this.totalBalance / this.listIndicadores.length;
+            this.promedioTotalSaldoFinaldia = this.totalSaldoFinaldia / this.listIndicadores.length;
         })
     }
 
@@ -144,7 +178,17 @@ export class CtaAhorroComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.spinIndicadores = true;
         this.listIndicadores = [];
-        this.extractoAhorroService.getIndicadoresPorFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this.totalSaldoInicialDia = 0;
+        this.totalEntradas = 0;
+        this.totalSalidas = 0;
+        this.totalBalance = 0;
+        this.totalSaldoFinaldia = 0;
+        this.promedioTotalSaldoInicialDia = 0;
+        this.promedioTotalEntradas = 0;
+        this.promedioTotalSalidas = 0;
+        this.promedioTotalBalance = 0;
+        this.promedioTotalSaldoFinaldia = 0;
+        this.extractoAhorroService.getIndicadoresPorFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinIndicadores = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado indicadores' });
@@ -157,15 +201,24 @@ export class CtaAhorroComponent implements OnInit {
                 element.salidas = Number(element.salidas);
                 element.diferencia = Number(element.diferencia);
                 element.saldo_final = Number(element.saldo_final);
+                this.totalSaldoInicialDia += element.saldo_anterior;
+                this.totalEntradas += element.entradas;
+                this.totalSalidas += element.salidas;
+                this.totalBalance += element.diferencia;
+                this.totalSaldoFinaldia += element.saldo_final;
             });
-
+            this.promedioTotalSaldoInicialDia = this.totalSaldoInicialDia / this.listIndicadores.length;
+            this.promedioTotalEntradas = this.totalEntradas / this.listIndicadores.length;
+            this.promedioTotalSalidas = this.totalSalidas / this.listIndicadores.length;
+            this.promedioTotalBalance = this.totalBalance / this.listIndicadores.length;
+            this.promedioTotalSaldoFinaldia = this.totalSaldoFinaldia / this.listIndicadores.length;
         })
     }
 
     getTotalIngresos(fechaInicial, fechaFinal) {
         this.spinIngresos = true;
         this.totalIngresos = 0;
-        this.extractoAhorroService.getIngresos(fechaInicial, fechaFinal).subscribe((data:any) =>{
+        this.extractoAhorroService.getIngresos(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinIngresos = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado ingresos' });
@@ -181,10 +234,10 @@ export class CtaAhorroComponent implements OnInit {
         })
     }
 
-    getTotalEgresos(fechaInicial,fechaFinal) {
+    getTotalEgresos(fechaInicial, fechaFinal) {
         this.spinEgresos = true;
         this.totalEgresos = 0;
-        this.extractoAhorroService.getEgresos(fechaInicial, fechaFinal).subscribe((data:any) =>{
+        this.extractoAhorroService.getEgresos(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinEgresos = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado egresos' });
@@ -200,10 +253,10 @@ export class CtaAhorroComponent implements OnInit {
         })
     }
 
-    getTotalSinComision(fechaInicial,fechaFinal) {
+    getTotalSinComision(fechaInicial, fechaFinal) {
         this.spinSinComisiones = true;
         this.totalSinComisiones = 0;
-        this.extractoAhorroService.getSinComisiones(fechaInicial, fechaFinal).subscribe((data:any) =>{
+        this.extractoAhorroService.getSinComisiones(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinSinComisiones = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado egresos' });
@@ -250,6 +303,22 @@ export class CtaAhorroComponent implements OnInit {
         let dataFiltrada = event.filteredValue;
         dataFiltrada.forEach(element => {
             this.totalValorDetalle += Number(element.valor);
+        });
+    }
+
+    filtroTotalizadoIndicadores(event, dt) {
+        this.totalSaldoInicialDia = 0;
+        this.totalEntradas = 0;
+        this.totalSalidas = 0;
+        this.totalBalance = 0;
+        this.totalSaldoFinaldia = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalSaldoInicialDia += Number(element.saldo_anterior);
+            this.totalEntradas += Number(element.entradas);
+            this.totalSalidas += Number(element.salidas);
+            this.totalBalance += Number(element.diferencia);
+            this.totalSaldoFinaldia += Number(element.saldo_final);
         });
     }
 
@@ -304,10 +373,10 @@ export class CtaAhorroComponent implements OnInit {
             case this.tableIngresos:
                 this.getTotalIngresos(this.fechaInicial, this.fechaFinal);
                 break;
-                case this.tableEgresos:
+            case this.tableEgresos:
                 this.getTotalEgresos(this.fechaInicial, this.fechaFinal);
                 break;
-                case this.tableSinComisiones:
+            case this.tableSinComisiones:
                 this.getTotalSinComision(this.fechaInicial, this.fechaFinal);
                 break;
             default:

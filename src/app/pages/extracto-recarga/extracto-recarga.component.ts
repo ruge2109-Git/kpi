@@ -19,10 +19,12 @@ export class ExtractoRecargaComponent implements OnInit {
     //Listas
     listExtractos: EXR_Extracto_recargas[] = [];
     listIndicadores: EXR_Indicadores[] = [];
+    listIndicadoresGenerales: EXR_Indicadores[] = [];
 
     //Fechas
     rangoFechasIndicadores: Date[] = [];
     rangoDetalleCompleto: Date[] = [];
+    rangoFechasIndicadoresGenerales: Date[] = [];
 
     //Progreso
     showProgressBar: boolean = false;
@@ -31,15 +33,25 @@ export class ExtractoRecargaComponent implements OnInit {
     //Spinners
     spinInfoCompleta: boolean = false;
     spinIndicador: boolean = false;
+    spinIndicadores: boolean = false;
 
     //Vista
     @ViewChild('tableIndicadores') tableIndicadores: Table;
     @ViewChild('tableInfoCompleta') tableInfoCompleta: Table;
+    @ViewChild('tableIndicadoresGenerales') tableIndicadoresGenerales: Table;
 
     //Totales
-    totalValorCompra:number = 0;
-    totalValorReparto:number = 0;
+    totalValorCompra: number = 0;
+    totalValorReparto: number = 0;
     totalValorComisiones: number = 0;
+
+    totalValorCompraGenerales: number = 0;
+    totalValorRepartoGenerales: number = 0;
+    totalValorComisionesGenerales: number = 0;
+
+    promedioTotalValorCompraGenerales: number = 0;
+    promedioTotalValorRepartoGenerales: number = 0;
+    promedioTotalValorComisionesGenerales: number = 0;
 
     totalValorCompleto: number = 0;
     totalSaldoAnteriorCompleto: number = 0;
@@ -55,6 +67,7 @@ export class ExtractoRecargaComponent implements OnInit {
     initData() {
         this.getIndicadores();
         this.getInfoCompleta();
+        this.getIndicadoresGenerales();
     }
 
     async onUpload(event) {
@@ -138,7 +151,7 @@ export class ExtractoRecargaComponent implements OnInit {
         this.totalValorCompleto = 0;
         this.totalSaldoAnteriorCompleto = 0;
         this.totalSaldoFinalCompleto = 0;
-        this.extRecarga.getExtractoRecargaPorFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this.extRecarga.getExtractoRecargaPorFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinInfoCompleta = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Información', detail: 'No hay información con el rango de fechas' });
@@ -178,7 +191,7 @@ export class ExtractoRecargaComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.spinIndicador = true;
         this.listIndicadores = [];
-        this.extRecarga.getIndicadoresPorFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this.extRecarga.getIndicadoresPorFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinIndicador = false;
             if (!data.bRta) {
                 this.messageService.add({ severity: 'error', summary: 'Información', detail: 'No hay información con el rango de fechas' });
@@ -193,6 +206,68 @@ export class ExtractoRecargaComponent implements OnInit {
         })
     }
 
+    getIndicadoresGenerales() {
+        this.spinIndicadores = true;
+        this.totalValorCompraGenerales = 0;
+        this.totalValorRepartoGenerales = 0;
+        this.totalValorComisionesGenerales = 0;
+        this.promedioTotalValorCompraGenerales = 0;
+        this.promedioTotalValorRepartoGenerales = 0;
+        this.promedioTotalValorComisionesGenerales = 0;
+        this.listIndicadoresGenerales = [];
+        this.extRecarga.getIndicadoresGenerales().subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) return;
+            this.listIndicadoresGenerales = data.data;
+            this.listIndicadoresGenerales.forEach(element => {
+                element.valor_compra = Number(element.valor_compra);
+                element.valor_reparto = Number(element.valor_reparto);
+                element.comision = Number(element.comision);
+                this.totalValorCompraGenerales += element.valor_compra;
+                this.totalValorRepartoGenerales += element.valor_reparto;
+                this.totalValorComisionesGenerales += element.comision;
+            });
+            this.promedioTotalValorCompraGenerales = this.totalValorCompraGenerales / this.listIndicadoresGenerales.length;
+            this.promedioTotalValorRepartoGenerales = this.totalValorRepartoGenerales / this.listIndicadoresGenerales.length;
+            this.promedioTotalValorComisionesGenerales = this.totalValorComisionesGenerales / this.listIndicadoresGenerales.length;
+
+        })
+    }
+
+    getIndicadoresGeneralesPorFecha() {
+        let fechaInicial = this.rangoFechasIndicadoresGenerales[0] != null ? this.formatDate(this.rangoFechasIndicadoresGenerales[0]) : null;
+        let fechaFinal = this.rangoFechasIndicadoresGenerales[1] != null ? this.formatDate(this.rangoFechasIndicadoresGenerales[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.spinIndicadores = true;
+        this.listIndicadoresGenerales = [];
+        this.totalValorCompraGenerales = 0;
+        this.totalValorRepartoGenerales = 0;
+        this.totalValorComisionesGenerales = 0;
+        this.promedioTotalValorCompraGenerales = 0;
+        this.promedioTotalValorRepartoGenerales = 0;
+        this.promedioTotalValorComisionesGenerales = 0;
+        this.extRecarga.getIndicadoresGeneralesFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Información', detail: 'No hay información con el rango de fechas' });
+                return;
+            };
+            this.listIndicadoresGenerales = data.data;
+            this.listIndicadoresGenerales.forEach(element => {
+                element.valor_compra = Number(element.valor_compra);
+                element.valor_reparto = Number(element.valor_reparto);
+                element.comision = Number(element.comision);
+                this.totalValorCompraGenerales += element.valor_compra;
+                this.totalValorRepartoGenerales += element.valor_reparto;
+                this.totalValorComisionesGenerales += element.comision;
+            });
+            this.promedioTotalValorCompraGenerales = this.totalValorCompraGenerales / this.listIndicadoresGenerales.length;
+            this.promedioTotalValorRepartoGenerales = this.totalValorRepartoGenerales / this.listIndicadoresGenerales.length;
+            this.promedioTotalValorComisionesGenerales = this.totalValorComisionesGenerales / this.listIndicadoresGenerales.length;
+        })
+    }
+
     filtroTotalizadoIndicadores(event, dt) {
         this.totalValorCompra = 0;
         this.totalValorReparto = 0;
@@ -203,6 +278,24 @@ export class ExtractoRecargaComponent implements OnInit {
             this.totalValorReparto += Number(element.valor_reparto);
             this.totalValorComisiones += Number(element.comision);
         });
+    }
+
+    filtroTotalizadoIndicadoresGenerales(event, dt) {
+        this.totalValorCompraGenerales = 0;
+        this.totalValorRepartoGenerales = 0;
+        this.totalValorComisionesGenerales = 0;
+        this.promedioTotalValorCompraGenerales = 0;
+        this.promedioTotalValorRepartoGenerales = 0;
+        this.promedioTotalValorComisionesGenerales = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalValorCompraGenerales += Number(element.valor_compra);
+            this.totalValorRepartoGenerales += Number(element.valor_reparto);
+            this.totalValorComisionesGenerales += Number(element.comision);
+        });
+        this.promedioTotalValorCompraGenerales = this.totalValorCompraGenerales / dataFiltrada.length;
+        this.promedioTotalValorRepartoGenerales = this.totalValorRepartoGenerales / dataFiltrada.length;
+        this.promedioTotalValorComisionesGenerales = this.totalValorComisionesGenerales / dataFiltrada.length;
     }
 
     filtroTotalizadoCompleto(event, dt) {
@@ -239,6 +332,10 @@ export class ExtractoRecargaComponent implements OnInit {
             case this.tableInfoCompleta:
                 this.getInfoCompleta();
                 this.rangoDetalleCompleto = [];
+                break;
+            case this.tableIndicadoresGenerales:
+                this.getIndicadoresGenerales();
+                this.rangoFechasIndicadoresGenerales = [];
                 break;
             default:
                 break;

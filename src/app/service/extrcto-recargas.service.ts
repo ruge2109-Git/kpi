@@ -33,5 +33,13 @@ export class ExtrctoRecargasService {
         return this.http.get(`${this.url}/extractoRecarga/indicadoresFecha/${fechaInicio}/${fechaFin}`);
     }
 
+    getIndicadoresGenerales() {
+        return this.http.get(`${this.url}/extractoRecarga/indicadoresGenerales`);
+    }
+
+    getIndicadoresGeneralesFecha(fechaInicio: string, fechaFin: string) {
+        return this.http.get(`${this.url}/extractoRecarga/indicadoresGeneralesFecha/${fechaInicio}/${fechaFin}`);
+    }
+
 
 }

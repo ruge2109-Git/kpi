@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { lastValueFrom } from 'rxjs';
-import { Sales_report, SR_Cliente_Canal, SR_Cliente_Operador, SR_Producto, SR_top_canal, SR_top_cliente, SR_top_operador } from 'src/app/models/recargas';
+import { Sales_report, SR_Cliente_Canal, SR_Cliente_Operador, SR_Indicador, SR_Producto, SR_top_canal, SR_top_cliente, SR_top_operador } from 'src/app/models/recargas';
 import { RecargasService } from 'src/app/service/recargas.service';
 
 @Component({
@@ -21,6 +21,7 @@ export class RecargasComponent implements OnInit {
 
     //Listas
     public listRecargas: Sales_report[] = [];
+    public listIndicadores: SR_Indicador[] = [];
     public listRecargasClienteCanal: SR_Cliente_Canal[] = [];
     public listRecargasClienteOperador: SR_Cliente_Operador[] = [];
     public listRecargasCliente: Sales_report[] = [];
@@ -37,6 +38,7 @@ export class RecargasComponent implements OnInit {
 
     //Spiners
     spinRecargas: boolean = false;
+    spinIndicadores: boolean = false;
     spinRecargasClienteCanal: boolean = false;
     spinRecargasClienteOperador: boolean = false;
     spinRecargasCliente: boolean = false;
@@ -50,6 +52,7 @@ export class RecargasComponent implements OnInit {
     valueProgressBar: number = 1;
 
     //Filtros
+    rangoFechasIndicadores: Date[] = [];
     rangoFechasClientesCanal: Date[] = [];
     rangoFechasClientesOperador: Date[] = [];
     rangoFechasClientesRecargas: Date[] = [];
@@ -66,6 +69,7 @@ export class RecargasComponent implements OnInit {
     @ViewChild('tableTopOperador') tableTopOperador: Table;
     @ViewChild('tableTopCliente') tableTopCliente: Table;
     @ViewChild('tableTopComision') tableTopComision: Table;
+    @ViewChild('tableIndicadores') tableIndicadores: Table;
 
     //Totalizado
     totalCantidadClientesCanal: number = 0;
@@ -80,7 +84,8 @@ export class RecargasComponent implements OnInit {
     totalVentasTopCliente: number = 0;
     totalCantidadTopCliente: number = 0;
     totalValorTopComisiones: number = 0;
-
+    totalIndicadores: number = 0;
+    totalPromedio: number = 0;
 
 
     constructor(private messageService: MessageService, private salesReportService: RecargasService) { }
@@ -97,6 +102,7 @@ export class RecargasComponent implements OnInit {
         this.getTopOperador();
         this.getTopCliente();
         this.getTopComisiones();
+        this.getIndicadores();
     }
 
     getSalesReport() {
@@ -108,6 +114,27 @@ export class RecargasComponent implements OnInit {
             //     element.valor_recarga = Number(element.valor_recarga);
             //     this.totalRecargasRealizadas += Number(element.valor_recarga);
             // });
+        })
+    }
+
+    getIndicadores() {
+        this.listIndicadores = [];
+        this.spinIndicadores = true;
+        this.totalIndicadores = 0;
+        this.totalPromedio = 0;
+        this.salesReportService.getIndicadores().subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango fechas indicadas' });
+                return;
+            };
+            this.listIndicadores = data.data;
+            this.listIndicadores.forEach(element => {
+                element.total = Number(element.total);
+                element.promedio = Number(element.promedio);
+                this.totalIndicadores += element.total;
+            });
+            this.totalPromedio = this.totalIndicadores / this.listIndicadores.length;
         })
     }
 
@@ -490,6 +517,32 @@ export class RecargasComponent implements OnInit {
         })
     }
 
+    getIndicadoresFechas() {
+        let fechaInicial = this.rangoFechasIndicadores[0] != null ? this.formatDate(this.rangoFechasIndicadores[0]) : null;
+        let fechaFinal = this.rangoFechasIndicadores[1] != null ? this.formatDate(this.rangoFechasIndicadores[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listIndicadores = [];
+        this.spinIndicadores = true;
+        this.totalIndicadores = 0;
+        this.totalPromedio = 0;
+        this.salesReportService.getIndicadoresFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango fechas indicadas' });
+                return;
+            };
+            this.listIndicadores = data.data;
+            this.listIndicadores.forEach(element => {
+                element.total = Number(element.total);
+                element.promedio = Number(element.promedio);
+                this.totalIndicadores += element.total;
+            });
+            this.totalPromedio = this.totalIndicadores / this.listIndicadores.length;
+
+        })
+    }
+
 
     //Totalizados
     filtroClientesCanal(event, dt) {
@@ -558,6 +611,17 @@ export class RecargasComponent implements OnInit {
         });
     }
 
+    filtroIndicadores(event, dt) {
+        this.totalIndicadores = 0;
+        this.totalPromedio = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalIndicadores += Number(element.total);
+        });
+        this.totalPromedio = this.totalIndicadores / dataFiltrada.length;
+
+    }
+
 
     clear(table: Table) {
         table.clear();
@@ -585,6 +649,10 @@ export class RecargasComponent implements OnInit {
             case this.tableTopCliente:
                 this.getTopCliente();
                 this.rangoFechasTopCliente = [];
+                break;
+            case this.tableIndicadores:
+                this.getIndicadores();
+                this.rangoFechasIndicadores = [];
                 break;
             default:
                 break;

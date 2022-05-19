@@ -21,6 +21,15 @@ export class RecargasService {
     }
 
     //Reportes
+
+    getIndicadores() {
+        return this.http.get(`${this.url}/sales_report/indicadores`);
+    }
+
+    getIndicadoresFecha(fechaIni:string,fechaFin:string) {
+        return this.http.get(`${this.url}/sales_report/indicadoresFecha/${fechaIni}/${fechaFin}`);
+    }
+
     getClienteCanal() {
         return this.http.get(`${this.url}/sales_report/clientesCanal`);
     }
