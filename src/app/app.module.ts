@@ -146,6 +146,7 @@ import { NgImageFullscreenViewModule } from 'ng-image-fullscreen-view';
 import { RecargasComponent } from './pages/recargas/recargas.component';
 import { ExtractosComponent } from './pages/extractos/extractos.component';
 import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
+import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-recarga.component';
 @NgModule({
     imports: [
         BrowserModule,
@@ -283,6 +284,7 @@ import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
         RecargasComponent,
         ExtractosComponent,
         CtaAhorroComponent,
+        ExtractoRecargaComponent,
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },

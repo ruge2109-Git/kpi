@@ -1,4 +1,4 @@
-export interface EXA_Extracto_ahorro {
+export interface EXR_Extracto_recargas {
     fecha: string;
     hora: string;
     descripcion: string;
@@ -11,11 +11,11 @@ export interface EXA_Extracto_ahorro {
     cliente_afectado: string;
 }
 
-export interface EXA_Indicadores{
+export interface EXR_Indicadores{
     fecha: string;
-    saldo_anterior: number;
-    entradas: number;
-    salidas: number;
-    diferencia: number;
-    saldo_final: number;
+    cliente_compra: string;
+    cliente_reparto: string;
+    valor_compra: number;
+    valor_reparto: number;
+    comision: number;
 }

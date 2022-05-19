@@ -32,6 +32,7 @@ import { TiendaOnlineComponent } from './pages/tienda-online/tienda-online.compo
 import { RecargasComponent } from './pages/recargas/recargas.component';
 import { ExtractosComponent } from './pages/extractos/extractos.component';
 import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
+import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-recarga.component';
 @NgModule({
     imports: [
         RouterModule.forRoot([
@@ -67,6 +68,7 @@ import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
                     { path: 'recargas', component: RecargasComponent },
                     { path: 'extractos', component: ExtractosComponent },
                     { path: 'ctaAhorro', component: CtaAhorroComponent },
+                    { path: 'extRecargas', component: ExtractoRecargaComponent },
                 ],
             },
             { path: 'pages/landing', component: LandingComponent },

@@ -330,6 +330,7 @@ export class TiendaOnlineComponent implements OnInit {
             this.listRecargas = data.data;
             this.listRecargas.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
+                element.tiene_archivos = Number(element.tiene_archivos);
             });
         })
     }
@@ -347,6 +348,7 @@ export class TiendaOnlineComponent implements OnInit {
             this.listRecargasTotalizados = data.data;
             this.listRecargasTotalizados.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
+                element.tiene_archivos = Number(element.tiene_archivos);
                 this.totalRecargas += Number(element.valor_recarga);
             });
         })
@@ -367,6 +369,7 @@ export class TiendaOnlineComponent implements OnInit {
             this.listRecargas = data.data;
             this.listRecargas.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
+                element.tiene_archivos = Number(element.tiene_archivos);
             });
         })
     }
@@ -386,6 +389,7 @@ export class TiendaOnlineComponent implements OnInit {
             };
             this.listRecargasTotalizados = data.data;
             this.listRecargasTotalizados.forEach(element => {
+                element.tiene_archivos = Number(element.tiene_archivos);
                 this.totalRecargas += Number(element.valor_recarga);
             });
         })
@@ -575,6 +579,7 @@ export class TiendaOnlineComponent implements OnInit {
             }
             this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Transacción guardada correctamente' });
             this.verArchivosRecarga(this.recargaSeleccionada);
+            this.getRecargas();
         })
     }
 

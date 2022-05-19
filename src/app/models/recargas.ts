@@ -57,3 +57,12 @@ export interface SR_top_cliente{
     cantidad: number;
     valor: number;
 }
+
+export interface SR_Producto{
+    cod_producto: number;
+    id_cliente: number;
+    cliente: string;
+    nom_producto :string;
+    tipo_comision :string;
+    valor_comision: number;
+}

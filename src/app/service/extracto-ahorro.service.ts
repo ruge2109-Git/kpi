@@ -31,4 +31,15 @@ export class ExtractoAhorroService {
     getIndicadoresPorFecha(fechaInicio: string, fechaFin: string) {
         return this.http.get(`${this.url}/extractoAhorro/indicadoresFecha/${fechaInicio}/${fechaFin}`);
     }
+
+    getIngresos(fechaInicio: string, fechaFin: string) {
+        return this.http.get(`${this.url}/extractoAhorro/totalIngresos/${fechaInicio}/${fechaFin}`);
+    }
+
+    getEgresos(fechaInicio: string, fechaFin: string) {
+        return this.http.get(`${this.url}/extractoAhorro/totalEgresos/${fechaInicio}/${fechaFin}`);
+    }
+    getSinComisiones(fechaInicio: string, fechaFin: string) {
+        return this.http.get(`${this.url}/extractoAhorro/sinComisiones/${fechaInicio}/${fechaFin}`);
+    }
 }

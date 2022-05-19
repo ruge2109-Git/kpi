@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
-import { Sales_report, SR_Cliente_Canal, SR_Cliente_Operador, SR_top_canal, SR_top_cliente, SR_top_operador } from 'src/app/models/recargas';
+import { Sales_report, SR_Cliente_Canal, SR_Cliente_Operador, SR_Producto, SR_top_canal, SR_top_cliente, SR_top_operador } from 'src/app/models/recargas';
 import { RecargasService } from 'src/app/service/recargas.service';
 
 @Component({
@@ -15,6 +14,10 @@ export class RecargasComponent implements OnInit {
 
     //Archivos
     uploadedFiles: any[] = [];
+    tipoComision: any[] = [
+        { name: 'Porcentaje', code: 'Porcentaje' },
+        { name: 'Pesos', code: 'Pesos' }
+    ];
 
     //Listas
     public listRecargas: Sales_report[] = [];
@@ -25,6 +28,7 @@ export class RecargasComponent implements OnInit {
     public listTopOperador: SR_top_operador[] = [];
     public listTopCliente: SR_top_cliente[] = [];
     public listTopComision: Sales_report[] = [];
+    public listProductos: SR_Producto[] = [];
 
     public recargaSeleccionada: Sales_report;
     public canalSeleccionado: SR_top_canal;
@@ -75,6 +79,7 @@ export class RecargasComponent implements OnInit {
     totalCantidadTopOperador: number = 0;
     totalVentasTopCliente: number = 0;
     totalCantidadTopCliente: number = 0;
+    totalValorTopComisiones: number = 0;
 
 
 
@@ -140,7 +145,7 @@ export class RecargasComponent implements OnInit {
         })
     }
 
-    getDetalleRecarga(dataCliente,dataCanal,dataOperador, tipoDetalle) {
+    getDetalleRecarga(dataCliente, dataCanal, dataOperador, tipoDetalle) {
 
         this.listRecargasCliente = [];
         this.spinRecargasCliente = true;
@@ -274,8 +279,8 @@ export class RecargasComponent implements OnInit {
         let dataSubir = this.listRecargas.length;
         let contador = 1;
         for (const recarga of this.listRecargas) {
-            const dateParts = recarga.fecha.split("/");
-            recarga.fecha = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+            // const dateParts = recarga.fecha.split("/");
+            // recarga.fecha = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
             await lastValueFrom(this.salesReportService.newSalesReporte(recarga)).then((data: any) => { });
             this.valueProgressBar = Math.round((contador * 100) / dataSubir);
             contador++;
@@ -545,6 +550,14 @@ export class RecargasComponent implements OnInit {
         });
     }
 
+    filtroTopComisiones(event, dt) {
+        this.totalValorTopComisiones = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalValorTopComisiones += Number(element.valor);
+        });
+    }
+
 
     clear(table: Table) {
         table.clear();
@@ -558,7 +571,7 @@ export class RecargasComponent implements OnInit {
                 this.rangoFechasClientesOperador = [];
                 break;
             case this.tableRecargasCliente:
-                this.getDetalleRecarga(this.recargaSeleccionada,this.canalSeleccionado,this.operadorSeleccionado, this.tipoDetalle);
+                this.getDetalleRecarga(this.recargaSeleccionada, this.canalSeleccionado, this.operadorSeleccionado, this.tipoDetalle);
                 this.rangoFechasClientesRecargas = [];
                 break;
             case this.tableTopCanal:
@@ -588,6 +601,11 @@ export class RecargasComponent implements OnInit {
 
     padTo2Digits(num) {
         return num.toString().padStart(2, '0');
+    }
+
+    updateProducto(data) {
+        console.log(data);
+
     }
 
 }

@@ -19,17 +19,28 @@ export class CtaAhorroComponent implements OnInit {
     //Listas
     listExtractos: EXA_Extracto_ahorro[] = [];
     listExtractosDetalle: EXA_Extracto_ahorro[] = [];
+    listIngresos: EXA_Extracto_ahorro[] = [];
+    listEgresos: EXA_Extracto_ahorro[] = [];
+    listSinComisiones: EXA_Extracto_ahorro[] = [];
     listIndicadores: EXA_Indicadores[] = [];
     indicadorSeleccionado: EXA_Indicadores;
 
+    fechaInicial: string = "";
+    fechaFinal: string = "";
 
     //Spiners
     spinIndicadores: boolean = false;
     spinDetalle: boolean = false;
+    spinIngresos: boolean = false;
+    spinEgresos: boolean = false;
+    spinSinComisiones: boolean = false;
 
     //Vista
     @ViewChild('tableIndicadores') tableIndicadores: Table;
     @ViewChild('tableDetalle') tableDetalle: Table;
+    @ViewChild('tableIngresos') tableIngresos: Table;
+    @ViewChild('tableEgresos') tableEgresos: Table;
+    @ViewChild('tableSinComisiones') tableSinComisiones: Table;
 
 
     //Progreso
@@ -42,6 +53,9 @@ export class CtaAhorroComponent implements OnInit {
 
     //Totales
     totalValorDetalle: number = 0;
+    totalIngresos: number = 0;
+    totalEgresos: number = 0;
+    totalSinComisiones: number = 0;
 
 
     constructor(private messageService: MessageService, private extractoAhorroService: ExtractoAhorroService) { }
@@ -141,9 +155,67 @@ export class CtaAhorroComponent implements OnInit {
                 element.saldo_anterior = Number(element.saldo_anterior);
                 element.entradas = Number(element.entradas);
                 element.salidas = Number(element.salidas);
+                element.diferencia = Number(element.diferencia);
                 element.saldo_final = Number(element.saldo_final);
             });
 
+        })
+    }
+
+    getTotalIngresos(fechaInicial, fechaFinal) {
+        this.spinIngresos = true;
+        this.totalIngresos = 0;
+        this.extractoAhorroService.getIngresos(fechaInicial, fechaFinal).subscribe((data:any) =>{
+            this.spinIngresos = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado ingresos' });
+                return;
+            }
+            this.listIngresos = data.data;
+            this.listIngresos.forEach(element => {
+                element.saldo_anterior = Number(element.saldo_anterior);
+                element.valor = Number(element.valor);
+                element.saldo_final = Number(element.saldo_final);
+                this.totalIngresos += element.valor;
+            });
+        })
+    }
+
+    getTotalEgresos(fechaInicial,fechaFinal) {
+        this.spinEgresos = true;
+        this.totalEgresos = 0;
+        this.extractoAhorroService.getEgresos(fechaInicial, fechaFinal).subscribe((data:any) =>{
+            this.spinEgresos = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado egresos' });
+                return;
+            }
+            this.listEgresos = data.data;
+            this.listEgresos.forEach(element => {
+                element.saldo_anterior = Number(element.saldo_anterior);
+                element.valor = Number(element.valor);
+                element.saldo_final = Number(element.saldo_final);
+                this.totalEgresos += element.valor;
+            });
+        })
+    }
+
+    getTotalSinComision(fechaInicial,fechaFinal) {
+        this.spinSinComisiones = true;
+        this.totalSinComisiones = 0;
+        this.extractoAhorroService.getSinComisiones(fechaInicial, fechaFinal).subscribe((data:any) =>{
+            this.spinSinComisiones = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'No se han encontrado egresos' });
+                return;
+            }
+            this.listSinComisiones = data.data;
+            this.listSinComisiones.forEach(element => {
+                element.saldo_anterior = Number(element.saldo_anterior);
+                element.valor = Number(element.valor);
+                element.saldo_final = Number(element.saldo_final);
+                this.totalSinComisiones += element.valor;
+            });
         })
     }
 
@@ -166,6 +238,11 @@ export class CtaAhorroComponent implements OnInit {
             });
 
         })
+        this.fechaInicial = indiTemp.fecha;
+        this.fechaFinal = indiTemp.fecha;
+        this.getTotalIngresos(indiTemp.fecha, indiTemp.fecha);
+        this.getTotalEgresos(indiTemp.fecha, indiTemp.fecha);
+        this.getTotalSinComision(indiTemp.fecha, indiTemp.fecha);
     }
 
     filtroTotalizadoDetalle(event, dt) {
@@ -173,6 +250,30 @@ export class CtaAhorroComponent implements OnInit {
         let dataFiltrada = event.filteredValue;
         dataFiltrada.forEach(element => {
             this.totalValorDetalle += Number(element.valor);
+        });
+    }
+
+    filtroTotalizadoIngresos(event, dt) {
+        this.totalIngresos = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalIngresos += Number(element.valor);
+        });
+    }
+
+    filtroTotalizadoEgresos(event, dt) {
+        this.totalEgresos = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalEgresos += Number(element.valor);
+        });
+    }
+
+    filtroTotalizadoComisiones(event, dt) {
+        this.totalSinComisiones = 0;
+        let dataFiltrada = event.filteredValue;
+        dataFiltrada.forEach(element => {
+            this.totalSinComisiones += Number(element.valor);
         });
     }
 
@@ -199,6 +300,15 @@ export class CtaAhorroComponent implements OnInit {
             case this.tableDetalle:
                 this.getDetalleCtaAhorro(this.indicadorSeleccionado);
                 this.rangoFechasDetalle = [];
+                break;
+            case this.tableIngresos:
+                this.getTotalIngresos(this.fechaInicial, this.fechaFinal);
+                break;
+                case this.tableEgresos:
+                this.getTotalEgresos(this.fechaInicial, this.fechaFinal);
+                break;
+                case this.tableSinComisiones:
+                this.getTotalSinComision(this.fechaInicial, this.fechaFinal);
                 break;
             default:
                 break;
