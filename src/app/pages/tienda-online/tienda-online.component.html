@@ -124,6 +124,10 @@
                 <td>Total</td>
                 <td>{{totalRecargas | currency:'$'}}</td>
               </tr>
+              <tr>
+                <td>Promedio</td>
+                <td>{{totalPromedioRecargas | currency:'$'}}</td>
+              </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
               <tr>
@@ -236,6 +240,103 @@
         </div>
       </div>
 
+      <div class="col-12 xl:col-6">
+        <div class="grid">
+          <div class="col-12">
+            <div class="card">
+              <h5>Recargas realizadas de clientes</h5>
+              <p-table [loading]="spinRecargas" #tableRecargasClientes [value]="listRecargasClientes" dataKey="code" [rows]="5" [paginator]="true" responsiveLayout="scroll" (onFilter)="filtroRecargasClientes($event, tableRecargasClientes)" [globalFilterFields]="['administrador','cliente','valor_recarga','fecha_recarga']">
+                <ng-template pTemplate="caption">
+                  <div class="flex justify-content-between flex-column sm:flex-row">
+                    <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRecargasClientes)"></button>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th pSortableColumn="administrador">Administrador
+                      <p-sortIcon field="administrador"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="cliente">Cliente
+                      <p-sortIcon field="cliente"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="valor_recarga">Valor recarga
+                      <p-sortIcon field="valor_recarga"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="fecha_recarga">Fecha
+                      <p-sortIcon field="fecha_recarga"></p-sortIcon>
+                    </th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <th>
+                      <p-columnFilter type="text" field="administrador"></p-columnFilter>
+                    </th>
+                    <th>
+                      <p-columnFilter type="text" field="cliente"></p-columnFilter>
+                    </th>
+                    <th>
+                    </th>
+                    <th>
+                      <div class="flex justify-content-between flex-column sm:flex-row">
+                        <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasRecargasClientes"></p-calendar>
+                        <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getRecargasClientesPorFechas()"></button>
+                      </div>
+                    </th>
+                    <th>
+                    </th>
+                  </tr>
+
+
+                </ng-template>
+                <ng-template pTemplate="body" let-data>
+                  <tr>
+                    <td style="min-width: 12rem;">
+                      {{data.administrador}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.cliente}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.valor_recarga | currency:'$'}}
+                    </td>
+                    <td style="min-width: 12rem;">
+                      {{data.fecha_recarga | date:'dd-MM-yyyy'}}
+                    </td>
+                    <td class="flex justify-content-center flex-column sm:flex-row">
+                      <button type="button" pButton pRipple icon="pi pi-file" (click)="verArchivosRecarga(data)" [ngClass]="{'p-button-outlined': data.tiene_archivos == 0}"></button>
+                      <button type="button" pButton pRipple icon="pi pi-search" (click)="getDetalleRecarga(data)" class="ml-3"></button>
+
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr>
+                    <td colspan="2">Total</td>
+                    <td>{{totalRecargasRealizadasClientes | currency:'$'}}</td>
+                    <td colspan="2"></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">Promedio</td>
+                    <td>{{totalPromedioRecargasRealizadasClientes | currency:'$'}}</td>
+                    <td colspan="2"></td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="8">Sin registros</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                  <tr>
+                    <td colspan="8">Cargando información, por favor espere</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <div class="col-12 xl:col-6">
         <div class="card">
@@ -290,87 +391,90 @@
             </ng-template>
           </p-table>
         </div>
-        <div class="card">
-          <h5>Comisiones</h5>
-          <p-table [loading]="spinDetalleRecarga" #tableComisiones [value]="listComisiones" dataKey="code" [rows]="4" [paginator]="true" responsiveLayout="scroll" (onFilter)="filtroComisiones($event,tableComisiones)" [globalFilterFields]="['usuario_vendedor','producto']">
-            <ng-template pTemplate="caption">
-              <div class="flex justify-content-between flex-column sm:flex-row">
-                <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisiones)"></button>
-              </div>
-            </ng-template>
-            <ng-template pTemplate="header">
-              <tr>
-                <th pSortableColumn="usuario_vendedor">Usuario
-                  <p-sortIcon field="usuario_vendedor"></p-sortIcon>
-                </th>
-                <th pSortableColumn="fecha_transaccion">Fecha transacción
-                  <p-sortIcon field="fecha_transaccion"></p-sortIcon>
-                </th>
-                <th pSortableColumn="producto">Producto
-                  <p-sortIcon field="producto"></p-sortIcon>
-                </th>
-                <th pSortableColumn="comisiones">Comisiones
-                  <p-sortIcon field="comisiones"></p-sortIcon>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  <p-columnFilter type="text" field="usuario_vendedor" ></p-columnFilter>
-                </th>
-                <th>
-                  <div class="flex justify-content-between flex-column sm:flex-row">
-                    <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasComisiones"></p-calendar>
-                    <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getComisionesPorFechas()"></button>
-                  </div>
-                </th>
-                <th>
-                  <p-columnFilter type="text" field="producto"></p-columnFilter>
-                </th>
-                <th>
-                </th>
-                <th>
-                </th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-data>
-              <tr>
-                <td style="min-width: 12rem;">
-                  {{data.usuario_vendedor}}
+      </div>
 
-                </td>
-                <td style="min-width: 12rem;">
-                  {{data.fecha_transaccion | date: 'dd-MM-yyyy'}}
-                </td>
-                <td style="min-width: 12rem;">
-                  {{data.producto }}
-                </td>
-                <td style="min-width: 12rem;">
-                  {{data.comisiones | currency: '$'}}
-                </td>
-                <td>
-                  <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona('None', data.usuario_vendedor)"></button>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="footer">
-              <tr>
-                <td colspan="3">Total</td>
-                <td>{{cantTotalComisiones | currency:'$'}}</td>
-                <td></td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="8">Sin registros</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="loadingbody">
-              <tr>
-                <td colspan="8">Cargando información, por favor espere</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
+      <div class="col-12 xl:col-6">
+        <div class="card">
+            <h5>Comisiones</h5>
+            <p-table [loading]="spinDetalleRecarga" #tableComisiones [value]="listComisiones" dataKey="code" [rows]="4" [paginator]="true" responsiveLayout="scroll" (onFilter)="filtroComisiones($event,tableComisiones)" [globalFilterFields]="['usuario_vendedor','producto']">
+              <ng-template pTemplate="caption">
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                  <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisiones)"></button>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th pSortableColumn="usuario_vendedor">Usuario
+                    <p-sortIcon field="usuario_vendedor"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="fecha_transaccion">Fecha transacción
+                    <p-sortIcon field="fecha_transaccion"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="producto">Producto
+                    <p-sortIcon field="producto"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="comisiones">Comisiones
+                    <p-sortIcon field="comisiones"></p-sortIcon>
+                  </th>
+                </tr>
+                <tr>
+                  <th>
+                    <p-columnFilter type="text" field="usuario_vendedor" ></p-columnFilter>
+                  </th>
+                  <th>
+                    <div class="flex justify-content-between flex-column sm:flex-row">
+                      <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasComisiones"></p-calendar>
+                      <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getComisionesPorFechas()"></button>
+                    </div>
+                  </th>
+                  <th>
+                    <p-columnFilter type="text" field="producto"></p-columnFilter>
+                  </th>
+                  <th>
+                  </th>
+                  <th>
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-data>
+                <tr>
+                  <td style="min-width: 12rem;">
+                    {{data.usuario_vendedor}}
+
+                  </td>
+                  <td style="min-width: 12rem;">
+                    {{data.fecha_transaccion | date: 'dd-MM-yyyy'}}
+                  </td>
+                  <td style="min-width: 12rem;">
+                    {{data.producto }}
+                  </td>
+                  <td style="min-width: 12rem;">
+                    {{data.comisiones | currency: '$'}}
+                  </td>
+                  <td>
+                    <button type="button" pButton pRipple icon="pi pi-search" (click)="getComprasPorPersona('None', data.usuario_vendedor)"></button>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <tr>
+                  <td colspan="3">Total</td>
+                  <td>{{cantTotalComisiones | currency:'$'}}</td>
+                  <td></td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="8">Sin registros</td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="loadingbody">
+                <tr>
+                  <td colspan="8">Cargando información, por favor espere</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
       </div>
 
     </div>

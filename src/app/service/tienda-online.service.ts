@@ -46,6 +46,14 @@ export class TiendaOnlineService {
         return this.http.get(`${this.url}/tienda/recargasFiltro/${fechaInicial}/${fechaFinal}`);
     }
 
+    getRecargasClientes() {
+        return this.http.get(`${this.url}/tienda/recargasClientes`);
+    }
+
+    getRecargasClientesFiltro(fechaInicial: string, fechaFinal: string) {
+        return this.http.get(`${this.url}/tienda/recargasClientesFiltro/${fechaInicial}/${fechaFinal}`);
+    }
+
     getRecargasTotalizado() {
         return this.http.get(`${this.url}/tienda/recargasTotalizado`);
     }

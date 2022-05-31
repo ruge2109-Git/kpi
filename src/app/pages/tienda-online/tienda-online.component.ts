@@ -24,6 +24,7 @@ export class TiendaOnlineComponent implements OnInit {
     listIndicadores: TO_IndicadoresGenerales[] = [];
     listProductos: TO_Producto[] = [];
     listRecargas: TO_Recargas[] = [];
+    listRecargasClientes: TO_Recargas[] = [];
     listRecargasTotalizados: TO_Recargas[] = [];
     listDetalleRecargas: TO_DetalleRecarga[] = [];
     listComisiones: TO_comisiones[] = [];
@@ -33,7 +34,10 @@ export class TiendaOnlineComponent implements OnInit {
     //Totalizados
     totalRecargasRealizadas: number = 0;
     totalPromedioRecargasRealizadas: number = 0;
+    totalRecargasRealizadasClientes: number = 0;
+    totalPromedioRecargasRealizadasClientes: number = 0;
     totalRecargas: number = 0;
+    totalPromedioRecargas: number = 0;
     cantProdVendidos: number = 0;
     totalProdVendidos: number = 0;
     cantPersVendidos: number = 0;
@@ -57,6 +61,7 @@ export class TiendaOnlineComponent implements OnInit {
     @ViewChild('tableProductos') tableProductos: Table;
     @ViewChild('tableVentasXPersona') tableVentasXPersona: Table;
     @ViewChild('tableRecargas') tableRecargas: Table;
+    @ViewChild('tableRecargasClientes') tableRecargasClientes: Table;
     @ViewChild('tableRecargasTotal') tableRecargasTotal: Table;
     @ViewChild('tableDetalleRecargas') tableDetalleRecargas: Table;
     @ViewChild('tableDetalleVenta') tableDetalleVenta: Table;
@@ -74,6 +79,7 @@ export class TiendaOnlineComponent implements OnInit {
     rangoFechasProdPerson: Date[] = [];
     rangoFechasDetalleVenta: Date[] = [];
     rangoFechasComisiones: Date[] = [];
+    rangoFechasRecargasClientes: Date[] = [];
     prodSelected: string = "";
     personSelectd: string = "";
     personComisiones: string = "";
@@ -111,6 +117,7 @@ export class TiendaOnlineComponent implements OnInit {
         this.getProductosMasVendidos();
         this.getPersonasConMasVentas();
         this.getRecargas();
+        this.getRecargasClientes();
         this.getRecargasTotalizado();
         this.getProductosDatabase();
     }
@@ -336,8 +343,22 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
+    getRecargasClientes() {
+        this.spinRecargas = true;
+        this.tiendaService.getRecargasClientes().subscribe((data: any) => {
+            this.spinRecargas = false;
+            if (!data.bRta) return;
+            this.listRecargasClientes = data.data;
+            this.listRecargasClientes.forEach(element => {
+                element.valor_recarga = Number(element.valor_recarga);
+                element.tiene_archivos = Number(element.tiene_archivos);
+            });
+        })
+    }
+
     getRecargasTotalizado() {
         this.totalRecargas = 0;
+        this.totalPromedioRecargas = 0;
         this.listRecargasTotalizados = [];
         this.spinRecargasTotalizadas = true;
         this.tiendaService.getRecargasTotalizado().subscribe((data: any) => {
@@ -347,11 +368,16 @@ export class TiendaOnlineComponent implements OnInit {
                 return;
             };
             this.listRecargasTotalizados = data.data;
+            let listaFechas = [];
             this.listRecargasTotalizados.forEach(element => {
                 element.valor_recarga = Number(element.valor_recarga);
                 element.tiene_archivos = Number(element.tiene_archivos);
                 this.totalRecargas += Number(element.valor_recarga);
+                if (!listaFechas.includes(element.fecha_recarga)) {
+                    listaFechas.push(element.fecha_recarga);
+                }
             });
+            this.totalPromedioRecargas = this.totalRecargas / (listaFechas.length == 0 ? 1 : listaFechas.length);
         })
     }
 
@@ -375,8 +401,29 @@ export class TiendaOnlineComponent implements OnInit {
         })
     }
 
+    getRecargasClientesPorFechas() {
+        let fechaInicial = this.rangoFechasRecargasClientes[0] != null ? this.formatDate(this.rangoFechasRecargasClientes[0]) : null;
+        let fechaFinal = this.rangoFechasRecargasClientes[1] != null ? this.formatDate(this.rangoFechasRecargasClientes[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.listRecargasClientes = [];
+        this.tiendaService.getRecargasClientesFiltro(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinRecargasTotalizadas = false;
+            if (!data.bRta) {
+                this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango fechas indicadas' });
+                return;
+            };
+            this.listRecargasClientes = data.data;
+            this.listRecargasClientes.forEach(element => {
+                element.valor_recarga = Number(element.valor_recarga);
+                element.tiene_archivos = Number(element.tiene_archivos);
+            });
+        })
+    }
+
     getRecargasTotalizadoPorFechas() {
         this.totalRecargas = 0;
+        this.totalPromedioRecargas = 0;
         let fechaInicial = this.rangoFechas[0] != null ? this.formatDate(this.rangoFechas[0]) : null;
         let fechaFinal = this.rangoFechas[1] != null ? this.formatDate(this.rangoFechas[1]) : null;
         if (fechaInicial == null) return;
@@ -388,11 +435,16 @@ export class TiendaOnlineComponent implements OnInit {
                 this.messageService.add({ severity: 'error', summary: 'Incorrecto', detail: 'No se han encontrado Recargas en el rango de fechas indicadas' });
                 return;
             };
+            let listaFechas = [];
             this.listRecargasTotalizados = data.data;
             this.listRecargasTotalizados.forEach(element => {
                 element.tiene_archivos = Number(element.tiene_archivos);
                 this.totalRecargas += Number(element.valor_recarga);
+                if (!listaFechas.includes(element.fecha_recarga)) {
+                    listaFechas.push(element.fecha_recarga);
+                }
             });
+            this.totalPromedioRecargas = this.totalRecargas / (listaFechas.length == 0 ? 1 : listaFechas.length);
         })
 
     }
@@ -514,6 +566,12 @@ export class TiendaOnlineComponent implements OnInit {
                 this.totalPromedioRecargasRealizadas = 0;
                 this.getRecargas();
                 this.rangoFechasRecargas = [];
+                break;
+            case this.tableRecargas:
+                this.totalRecargasRealizadasClientes = 0;
+                this.totalPromedioRecargasRealizadasClientes = 0;
+                this.getRecargasClientes();
+                this.rangoFechasRecargasClientes = [];
                 break;
             case this.tableVentasYProducto:
                 this.getComprasPorPersona(this.prodSelected, this.personSelectd);
@@ -766,9 +824,21 @@ export class TiendaOnlineComponent implements OnInit {
                 listaFechas.push(element.fecha_recarga);
             }
         });
-        console.log(listaFechas);
-
         this.totalPromedioRecargasRealizadas = this.totalRecargasRealizadas / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
+    filtroRecargasClientes(event, dt) {
+        this.totalRecargasRealizadasClientes = 0;
+        this.totalPromedioRecargasRealizadasClientes = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalRecargasRealizadasClientes += Number(element.valor_recarga);
+            if (!listaFechas.includes(element.fecha_recarga)) {
+                listaFechas.push(element.fecha_recarga);
+            }
+        });
+        this.totalPromedioRecargasRealizadasClientes = this.totalRecargasRealizadasClientes / (listaFechas.length == 0 ? 1 : listaFechas.length);
     }
 
     filtroProductos(event, dt) {
