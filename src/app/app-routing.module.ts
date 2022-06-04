@@ -33,6 +33,8 @@ import { RecargasComponent } from './pages/recargas/recargas.component';
 import { ExtractosComponent } from './pages/extractos/extractos.component';
 import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
 import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-recarga.component';
+import { MiEntretenimientoComponent } from './pages/mi-entretenimiento/mi-entretenimiento.component';
+import { RtaCuentasComponent } from './pages/mi-entretenimiento/rta-cuentas/rta-cuentas.component';
 @NgModule({
     imports: [
         RouterModule.forRoot([
@@ -64,11 +66,15 @@ import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-reca
                     { path: 'icons', component: IconsComponent },
                     { path: 'blocks', component: BlocksComponent },
                     { path: 'documentation', component: DocumentationComponent },
+                    //Pages
                     { path: 'tiendaOnline', component: TiendaOnlineComponent },
                     { path: 'recargas', component: RecargasComponent },
                     { path: 'extractos', component: ExtractosComponent },
                     { path: 'ctaAhorro', component: CtaAhorroComponent },
                     { path: 'extRecargas', component: ExtractoRecargaComponent },
+                    { path: 'miEntretenimiento', component: MiEntretenimientoComponent },
+                    { path: 'miEntretenimiento/rtaCuentas', component: RtaCuentasComponent },
+
                 ],
             },
             { path: 'pages/landing', component: LandingComponent },

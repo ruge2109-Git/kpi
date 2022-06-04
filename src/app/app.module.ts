@@ -147,6 +147,8 @@ import { RecargasComponent } from './pages/recargas/recargas.component';
 import { ExtractosComponent } from './pages/extractos/extractos.component';
 import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
 import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-recarga.component';
+import { MiEntretenimientoComponent } from './pages/mi-entretenimiento/mi-entretenimiento.component';
+import { RtaCuentasComponent } from './pages/mi-entretenimiento/rta-cuentas/rta-cuentas.component';
 @NgModule({
     imports: [
         BrowserModule,
@@ -285,6 +287,8 @@ import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-reca
         ExtractosComponent,
         CtaAhorroComponent,
         ExtractoRecargaComponent,
+        MiEntretenimientoComponent,
+        RtaCuentasComponent,
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },
