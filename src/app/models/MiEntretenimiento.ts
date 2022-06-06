@@ -11,6 +11,16 @@ export interface MiEn_Movimientos{
     tipo:string;
 }
 
+export interface MIEn_Respuesta{
+    cod_respuesta?: string;
+    id:string;
+    cuenta_afectada:string;
+    password:string;
+    resuelto:string;
+    fecha_respuesta:string;
+    respuesta:string;
+}
+
 export interface MIEn_Indicadores{
     fecha: string;
     ventas: number;

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { MiEn_Movimientos } from '../models/MiEntretenimiento';
+import { MiEn_Movimientos, MIEn_Respuesta } from '../models/MiEntretenimiento';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,14 @@ export class MiEntretenimientoService {
 
     newMovimiento(miEntretenimiento: MiEn_Movimientos) {
         return this.http.post(`${this.url}/miEntretenimiento/nuevo`, miEntretenimiento);
+    }
+
+    getDataRespuesta() {
+        return this.http.get(`${this.url}/miEntretenimientoRespuesta`);
+    }
+
+    newRespuesta(miEntretenimiento: MIEn_Respuesta) {
+        return this.http.post(`${this.url}/miEntretenimientoRespuesta/nuevo`, miEntretenimiento);
     }
 
     getIndicadores() {
