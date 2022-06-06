@@ -4,7 +4,7 @@ import { Table } from 'primeng/table';
 import readXlsxFile, { Row } from 'read-excel-file';
 import { Cell } from 'read-excel-file/types';
 import { lastValueFrom } from 'rxjs';
-import { MiEn_Movimientos } from 'src/app/models/MiEntretenimiento';
+import { MIEn_Indicadores, MiEn_Movimientos } from 'src/app/models/MiEntretenimiento';
 import { MiEntretenimientoService } from 'src/app/service/mi-entretenimiento.service';
 
 @Component({
@@ -29,6 +29,7 @@ export class MiEntretenimientoComponent implements OnInit {
     listRenovacion: MiEn_Movimientos[] = [];
     listDevolucionRenovacion: MiEn_Movimientos[] = [];
     listRecepcionSaldo: MiEn_Movimientos[] = [];
+    listIndicadores: MIEn_Indicadores[] = [];
 
     //Spinners
     spinVentas: boolean = false;
@@ -39,6 +40,7 @@ export class MiEntretenimientoComponent implements OnInit {
     spinRenovacion: boolean = false;
     spinDevolucionRenovacion: boolean = false;
     spinRecepcionSaldo: boolean = false;
+    spinIndicadores: boolean = false;
 
     //Totales
     totalVentas: number = 0;
@@ -50,6 +52,15 @@ export class MiEntretenimientoComponent implements OnInit {
     totalDevolucionRenovacion: number = 0;
     totalRecepcionSaldo: number = 0;
 
+    totalIndicadoresVentas: number = 0;
+    totalIndicadorescambio_cuenta: number = 0;
+    totalIndicadorescomision_venta: number = 0;
+    totalIndicadorescompra_saldo: number = 0;
+    totalIndicadorescomision_renovacion: number = 0;
+    totalIndicadoresrenovacion: number = 0;
+    totalIndicadoresdevolucion_renovacion: number = 0;
+    totalIndicadoresrecepcion_saldo: number = 0;
+
     totalPromedioVentas: number = 0;
     totalPromedioCambioCuenta: number = 0;
     totalPromedioComisionPorVenta: number = 0;
@@ -58,6 +69,17 @@ export class MiEntretenimientoComponent implements OnInit {
     totalPromedioRenovacion: number = 0;
     totalPromedioDevolucionRenovacion: number = 0;
     totalPromedioRecepcionSaldo: number = 0;
+    totalPromedioIndicadores: number = 0;
+
+
+    totalPromedioIndicadoresVentas: number = 0;
+    totalPromedioIndicadorescambio_cuenta: number = 0;
+    totalPromedioIndicadorescomision_venta: number = 0;
+    totalPromedioIndicadorescompra_saldo: number = 0;
+    totalPromedioIndicadorescomision_renovacion: number = 0;
+    totalPromedioIndicadoresrenovacion: number = 0;
+    totalPromedioIndicadoresdevolucion_renovacion: number = 0;
+    totalPromedioIndicadoresrecepcion_saldo: number = 0;
 
     //Rango fechas
     rangoFechasVentas: Date[] = [];
@@ -68,15 +90,18 @@ export class MiEntretenimientoComponent implements OnInit {
     rangoRenovacion: Date[] = [];
     rangoDevolucionRenovacion: Date[] = [];
     rangoRecepcionSaldo: Date[] = [];
+    rangoIndicadores: Date[] = [];
 
     //Tablas
     @ViewChild('tableVentas') tableVentas: Table;
     @ViewChild('tableCambioCuenta') tableCambioCuenta: Table;
     @ViewChild('tableComisionVenta') tableComisionVenta: Table;
     @ViewChild('tableCompraSaldo') tableCompraSaldo: Table;
-    // @ViewChild('tableVentas') tableVentas: Table;
-    // @ViewChild('tableVentas') tableVentas: Table;
-    // @ViewChild('tableVentas') tableVentas: Table;
+    @ViewChild('tableComisionRenovacion') tableComisionRenovacion: Table;
+    @ViewChild('tableRenovacion') tableRenovacion: Table;
+    @ViewChild('tableDevolucionRenovacion') tableDevolucionRenovacion: Table;
+    @ViewChild('tableRecepcionSaldo') tableRecepcionSaldo: Table;
+    @ViewChild('tableIndicadores') tableIndicadores: Table;
 
 
     //Progreso
@@ -103,6 +128,111 @@ export class MiEntretenimientoComponent implements OnInit {
             this.getRenovacion();
             this.getDevolucionRenovacion();
             this.getRecepcionSaldo();
+            this.getIndicadores();
+        })
+    }
+
+    getIndicadores() {
+        this.spinIndicadores = true;
+        this.totalIndicadoresVentas = 0;
+        this.totalIndicadorescambio_cuenta = 0;
+        this.totalIndicadorescomision_venta = 0;
+        this.totalIndicadorescompra_saldo = 0;
+        this.totalIndicadorescomision_renovacion = 0;
+        this.totalIndicadoresrenovacion = 0;
+        this.totalIndicadoresdevolucion_renovacion = 0;
+        this.totalIndicadoresrecepcion_saldo = 0;
+
+        this.totalPromedioIndicadoresVentas = 0;
+        this.totalPromedioIndicadorescambio_cuenta = 0;
+        this.totalPromedioIndicadorescomision_venta = 0;
+        this.totalPromedioIndicadorescompra_saldo = 0;
+        this.totalPromedioIndicadorescomision_renovacion = 0;
+        this.totalPromedioIndicadoresrenovacion = 0;
+        this.totalPromedioIndicadoresdevolucion_renovacion = 0;
+        this.totalPromedioIndicadoresrecepcion_saldo = 0;
+
+        this.listIndicadores = [];
+        this.miEntretenimientoService.getIndicadores().subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) return;
+            this.listIndicadores = data.data;
+            this.listIndicadores.forEach(element => {
+                element.ventas = Number(element.ventas);
+                element.cambio_cuenta = Number(element.cambio_cuenta);
+                element.comision_venta = Number(element.comision_venta);
+                element.compra_saldo = Number(element.compra_saldo);
+                element.comision_renovacion = Number(element.comision_renovacion);
+                element.renovacion = Number(element.renovacion);
+                element.devolucion_renovacion = Number(element.devolucion_renovacion);
+                element.recepcion_saldo = Number(element.recepcion_saldo);
+
+                this.totalIndicadoresVentas = element.ventas;
+                this.totalIndicadorescambio_cuenta = element.cambio_cuenta;
+                this.totalIndicadorescomision_venta = element.comision_venta;
+                this.totalIndicadorescompra_saldo = element.compra_saldo;
+                this.totalIndicadorescomision_renovacion = element.comision_renovacion;
+                this.totalIndicadoresrenovacion = element.renovacion;
+                this.totalIndicadoresdevolucion_renovacion = element.devolucion_renovacion;
+                this.totalIndicadoresrecepcion_saldo = element.recepcion_saldo;
+
+
+            });
+        })
+    }
+
+    getIndicadoresFecha() {
+
+        let fechaInicial = this.rangoIndicadores[0] != null ? this.formatDate(this.rangoIndicadores[0]) : null;
+        let fechaFinal = this.rangoIndicadores[1] != null ? this.formatDate(this.rangoIndicadores[1]) : null;
+        if (fechaInicial == null) return;
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+
+        this.spinIndicadores = true;
+        this.totalIndicadoresVentas = 0;
+        this.totalIndicadorescambio_cuenta = 0;
+        this.totalIndicadorescomision_venta = 0;
+        this.totalIndicadorescompra_saldo = 0;
+        this.totalIndicadorescomision_renovacion = 0;
+        this.totalIndicadoresrenovacion = 0;
+        this.totalIndicadoresdevolucion_renovacion = 0;
+        this.totalIndicadoresrecepcion_saldo = 0;
+
+        this.totalPromedioIndicadoresVentas = 0;
+        this.totalPromedioIndicadorescambio_cuenta = 0;
+        this.totalPromedioIndicadorescomision_venta = 0;
+        this.totalPromedioIndicadorescompra_saldo = 0;
+        this.totalPromedioIndicadorescomision_renovacion = 0;
+        this.totalPromedioIndicadoresrenovacion = 0;
+        this.totalPromedioIndicadoresdevolucion_renovacion = 0;
+        this.totalPromedioIndicadoresrecepcion_saldo = 0;
+
+        this.listIndicadores = [];
+        this.miEntretenimientoService.getIndicadoresFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+            this.spinIndicadores = false;
+            if (!data.bRta) return;
+            this.listIndicadores = data.data;
+            this.listIndicadores.forEach(element => {
+                element.ventas = Number(element.ventas);
+                element.cambio_cuenta = Number(element.cambio_cuenta);
+                element.comision_venta = Number(element.comision_venta);
+                element.compra_saldo = Number(element.compra_saldo);
+                element.comision_renovacion = Number(element.comision_renovacion);
+                element.renovacion = Number(element.renovacion);
+                element.devolucion_renovacion = Number(element.devolucion_renovacion);
+                element.recepcion_saldo = Number(element.recepcion_saldo);
+
+                this.totalIndicadoresVentas = element.ventas;
+                this.totalIndicadorescambio_cuenta = element.cambio_cuenta;
+                this.totalIndicadorescomision_venta = element.comision_venta;
+                this.totalIndicadorescompra_saldo = element.compra_saldo;
+                this.totalIndicadorescomision_renovacion = element.comision_renovacion;
+                this.totalIndicadoresrenovacion = element.renovacion;
+                this.totalIndicadoresdevolucion_renovacion = element.devolucion_renovacion;
+                this.totalIndicadoresrecepcion_saldo = element.recepcion_saldo;
+
+
+            });
         })
     }
 
@@ -224,12 +354,50 @@ export class MiEntretenimientoComponent implements OnInit {
         this.spinComisionPorVenta = false;
     }
 
+    getComisionRenovacionFecha() {
+        let startDate = this.rangoComisionPorRenovacion[0] != null ? this.rangoComisionPorRenovacion[0] : null;
+        let endDate = this.rangoComisionPorRenovacion[1] != null ? this.rangoComisionPorRenovacion[1] : null;
+        if (startDate == null) return;
+        if (endDate == null) {
+            endDate = new Date(startDate);
+        }
+        endDate.setHours(23, 59, 59);
+        this.listComisionPorRenovacion = this.listData.filter((element) => {
+
+            let currentDate = new Date(element.fecha);
+            if ((element.movimiento == 'Comisión por renovación') && (currentDate >= startDate && currentDate <= endDate)) {
+                return true;
+            }
+            return false;
+        });
+
+    }
+
     getRenovacion() {
         this.spinRenovacion = true;
         this.totalRenovacion = 0;
         this.listRenovacion = [];
         this.listRenovacion = this.listData.filter((data) => data.movimiento == 'Renovación');
         this.spinRenovacion = false;
+    }
+
+    getRenovacionFecha() {
+        let startDate = this.rangoRenovacion[0] != null ? this.rangoRenovacion[0] : null;
+        let endDate = this.rangoRenovacion[1] != null ? this.rangoRenovacion[1] : null;
+        if (startDate == null) return;
+        if (endDate == null) {
+            endDate = new Date(startDate);
+        }
+        endDate.setHours(23, 59, 59);
+        this.listRenovacion = this.listData.filter((element) => {
+
+            let currentDate = new Date(element.fecha);
+            if ((element.movimiento == 'Renovación') && (currentDate >= startDate && currentDate <= endDate)) {
+                return true;
+            }
+            return false;
+        });
+
     }
 
     getDevolucionRenovacion() {
@@ -240,12 +408,52 @@ export class MiEntretenimientoComponent implements OnInit {
         this.spinDevolucionRenovacion = false;
     }
 
+    getDevolucionRenovacionFecha() {
+
+        let startDate = this.rangoDevolucionRenovacion[0] != null ? this.rangoDevolucionRenovacion[0] : null;
+        let endDate = this.rangoDevolucionRenovacion[1] != null ? this.rangoDevolucionRenovacion[1] : null;
+        if (startDate == null) return;
+        if (endDate == null) {
+            endDate = new Date(startDate);
+        }
+        endDate.setHours(23, 59, 59);
+        this.listDevolucionRenovacion = this.listData.filter((element) => {
+
+            let currentDate = new Date(element.fecha);
+            if ((element.movimiento == 'Devolución renovación') && (currentDate >= startDate && currentDate <= endDate)) {
+                return true;
+            }
+            return false;
+        });
+
+    }
+
     getRecepcionSaldo() {
         this.spinRecepcionSaldo = true;
         this.totalRecepcionSaldo = 0;
         this.listRecepcionSaldo = [];
         this.listRecepcionSaldo = this.listData.filter((data) => data.movimiento == 'Recepción de saldo');
         this.spinRecepcionSaldo = false;
+    }
+
+    getRecepcionSaldoFecha() {
+
+        let startDate = this.rangoRecepcionSaldo[0] != null ? this.rangoRecepcionSaldo[0] : null;
+        let endDate = this.rangoRecepcionSaldo[1] != null ? this.rangoRecepcionSaldo[1] : null;
+        if (startDate == null) return;
+        if (endDate == null) {
+            endDate = new Date(startDate);
+        }
+        endDate.setHours(23, 59, 59);
+        this.listRecepcionSaldo = this.listData.filter((element) => {
+
+            let currentDate = new Date(element.fecha);
+            if ((element.movimiento == 'Recepción de saldo') && (currentDate >= startDate && currentDate <= endDate)) {
+                return true;
+            }
+            return false;
+        });
+
     }
 
     async onUpload(event) {
@@ -426,6 +634,107 @@ export class MiEntretenimientoComponent implements OnInit {
         this.totalPromedioCompraSaldo = this.totalCompraSaldo / (listaFechas.length == 0 ? 1 : listaFechas.length);
     }
 
+    filtroComisionRenovacion(event, table) {
+        this.totalComisionPorRenovacion = 0;
+        this.totalPromedioComisionPorRenovacion = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalComisionPorRenovacion += Number(element.valor);
+            if (!listaFechas.includes(element.fecha.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha.toString().split(" ")[0]);
+            }
+        });
+        this.totalPromedioComisionPorRenovacion = this.totalComisionPorRenovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
+    filtroRenovacion(event, table) {
+        this.totalRenovacion = 0;
+        this.totalPromedioRenovacion = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalRenovacion += Number(element.valor);
+            if (!listaFechas.includes(element.fecha.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha.toString().split(" ")[0]);
+            }
+        });
+        this.totalPromedioRenovacion = this.totalRenovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
+    filtroDevolucionRenovacion(event, table) {
+        this.totalDevolucionRenovacion = 0;
+        this.totalPromedioDevolucionRenovacion = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalDevolucionRenovacion += Number(element.valor);
+            if (!listaFechas.includes(element.fecha.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha.toString().split(" ")[0]);
+            }
+        });
+        this.totalPromedioDevolucionRenovacion = this.totalDevolucionRenovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
+    filtroRecepcionSaldo(event, table) {
+        this.totalRecepcionSaldo = 0;
+        this.totalPromedioRecepcionSaldo = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalRecepcionSaldo += Number(element.valor);
+            if (!listaFechas.includes(element.fecha.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha.toString().split(" ")[0]);
+            }
+        });
+        this.totalPromedioRecepcionSaldo = this.totalRecepcionSaldo / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
+    filtroIndicadores(event, table) {
+        this.totalIndicadoresVentas = 0;
+        this.totalIndicadorescambio_cuenta = 0;
+        this.totalIndicadorescomision_venta = 0;
+        this.totalIndicadorescompra_saldo = 0;
+        this.totalIndicadorescomision_renovacion = 0;
+        this.totalIndicadoresrenovacion = 0;
+        this.totalIndicadoresdevolucion_renovacion = 0;
+        this.totalIndicadoresrecepcion_saldo = 0;
+
+        this.totalPromedioIndicadoresVentas = 0;
+        this.totalPromedioIndicadorescambio_cuenta = 0;
+        this.totalPromedioIndicadorescomision_venta = 0;
+        this.totalPromedioIndicadorescompra_saldo = 0;
+        this.totalPromedioIndicadorescomision_renovacion = 0;
+        this.totalPromedioIndicadoresrenovacion = 0;
+        this.totalPromedioIndicadoresdevolucion_renovacion = 0;
+        this.totalPromedioIndicadoresrecepcion_saldo = 0;
+
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.totalIndicadoresVentas += Number(element.ventas);
+            this.totalIndicadorescambio_cuenta += Number(element.cambio_cuenta);
+            this.totalIndicadorescomision_venta += Number(element.comision_venta);
+            this.totalIndicadorescompra_saldo += Number(element.compra_saldo);
+            this.totalIndicadorescomision_renovacion += Number(element.comision_renovacion);
+            this.totalIndicadoresrenovacion += Number(element.renovacion);
+            this.totalIndicadoresdevolucion_renovacion += Number(element.devolucion_renovacion);
+            this.totalIndicadoresrecepcion_saldo += Number(element.recepcion_saldo);
+
+            if (!listaFechas.includes(element.fecha.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha.toString().split(" ")[0]);
+            }
+        });
+        this.totalPromedioIndicadoresVentas = this.totalIndicadoresVentas / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadorescambio_cuenta = this.totalIndicadorescambio_cuenta / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadorescomision_venta = this.totalIndicadorescomision_venta / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadorescompra_saldo = this.totalIndicadorescompra_saldo / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadorescomision_renovacion = this.totalIndicadorescomision_renovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadoresrenovacion = this.totalIndicadoresrenovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadoresdevolucion_renovacion = this.totalIndicadoresdevolucion_renovacion / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.totalPromedioIndicadoresrecepcion_saldo = this.totalIndicadoresrecepcion_saldo / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
     clear(table: Table) {
         table.clear();
         switch (table) {
@@ -444,6 +753,26 @@ export class MiEntretenimientoComponent implements OnInit {
             case this.tableCompraSaldo:
                 this.getCompraSaldo();
                 this.rangoCompraSaldo = [];
+                break;
+            case this.tableComisionRenovacion:
+                this.getComisionRenovacion();
+                this.rangoComisionPorRenovacion = [];
+                break;
+            case this.tableRenovacion:
+                this.getRenovacion();
+                this.rangoRenovacion = [];
+                break;
+            case this.tableDevolucionRenovacion:
+                this.getDevolucionRenovacion();
+                this.rangoDevolucionRenovacion = [];
+                break;
+            case this.tableRecepcionSaldo:
+                this.getRecepcionSaldo();
+                this.rangoRecepcionSaldo = [];
+                break;
+            case this.tableIndicadores:
+                this.getIndicadores();
+                this.rangoIndicadores = [];
                 break;
 
             default:

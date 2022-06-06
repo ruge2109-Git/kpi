@@ -19,4 +19,12 @@ export class MiEntretenimientoService {
     newMovimiento(miEntretenimiento: MiEn_Movimientos) {
         return this.http.post(`${this.url}/miEntretenimiento/nuevo`, miEntretenimiento);
     }
+
+    getIndicadores() {
+        return this.http.get(`${this.url}/miEntretenimiento/indicadores`);
+    }
+
+    getIndicadoresFecha(fechaIni:string,fechaFin:string) {
+        return this.http.get(`${this.url}/miEntretenimiento/indicadoresFecha/${fechaIni}/${fechaFin}`);
+    }
 }

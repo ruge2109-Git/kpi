@@ -7,19 +7,160 @@
       <h5>Seleccione los archivos - Movimientos </h5>
       <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event)" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
       </p-fileUpload>
+      <div class="mt-4" *ngIf="showProgressBar">
+        <h5>Barra de progreso</h5>
+        <p-progressBar [value]="valueProgressBar"></p-progressBar>
+      </div>
     </div>
 
-    <div class="mb-4" *ngIf="showProgressBar">
-      <h5>Barra de progreso</h5>
-      <p-progressBar [value]="valueProgressBar"></p-progressBar>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <h5>Indicadores</h5>
+      <p-table [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" dataKey="code" [rows]="10" (onFilter)="filtroIndicadores($event,tableIndicadores)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha']" [rowsPerPageOptions]="[5,10,20,50]">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIndicadores)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ventas">Ventas
+              <p-sortIcon field="ventas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cambio_cuenta">Cambio cuenta
+              <p-sortIcon field="cambio_cuenta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="comision_venta">Comisión venta
+              <p-sortIcon field="comision_venta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="compra_saldo">Compra saldo
+              <p-sortIcon field="compra_saldo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="comision_renovacion">Comisión renovación
+              <p-sortIcon field="comision_renovacion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="renovacion">Renovación
+              <p-sortIcon field="renovacion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="devolucion_renovacion">Devolución renovación
+              <p-sortIcon field="devolucion_renovacion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="recepcion_saldo">Recepción saldo
+              <p-sortIcon field="recepcion_saldo"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoIndicadores"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getIndicadoresFecha()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="ventas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="cambio_cuenta"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="comision_venta"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="compra_saldo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="comision_renovacion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="renovacion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="devolucion_renovacion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="recepcion_saldo"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.ventas | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.cambio_cuenta | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.comision_venta | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.compra_saldo | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.comision_renovacion | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.renovacion | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.devolucion_renovacion | currency:'$'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.recepcion_saldo | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="1">Total</td>
+            <td>{{totalIndicadoresVentas | currency:'$'}}</td>
+            <td>{{totalIndicadorescambio_cuenta | currency:'$'}}</td>
+            <td>{{totalIndicadorescomision_venta | currency:'$'}}</td>
+            <td>{{totalIndicadorescompra_saldo | currency:'$'}}</td>
+            <td>{{totalIndicadorescomision_renovacion | currency:'$'}}</td>
+            <td>{{totalIndicadoresrenovacion | currency:'$'}}</td>
+            <td>{{totalIndicadoresdevolucion_renovacion | currency:'$'}}</td>
+            <td>{{totalIndicadoresrecepcion_saldo | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="1">Promedio</td>
+            <td>{{totalPromedioIndicadoresVentas | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadorescambio_cuenta | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadorescomision_venta | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadorescompra_saldo | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadorescomision_renovacion | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadoresrenovacion | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadoresdevolucion_renovacion | currency:'$'}}</td>
+            <td>{{totalPromedioIndicadoresrecepcion_saldo | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
 
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Ventas</h5>
-      <p-table [loading]="spinVentas" #tableVentas [value]="listVentas" dataKey="code" [rows]="10" (onFilter)="filtroVentas($event,tableVentas)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','id','movimiento','descripcion','producto','valor']"  [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinVentas" #tableVentas [value]="listVentas" dataKey="code" [rows]="10" (onFilter)="filtroVentas($event,tableVentas)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','descripcion','producto','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableVentas)"></button>
@@ -119,8 +260,8 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Comisión por venta</h5>
-      <p-table [loading]="spinComisionPorVenta" #tableComisionVenta [value]="listComisionPorVenta" dataKey="code" [rows]="10" (onFilter)="filtroComisionVentas($event,tableComisionVenta)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','id','movimiento','producto','valor']"  [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinComisionPorVenta" #tableComisionVenta [value]="listComisionPorVenta" dataKey="code" [rows]="10" (onFilter)="filtroComisionVentas($event,tableComisionVenta)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','producto','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisionVenta)"></button>
@@ -211,8 +352,7 @@
   <div class="col-12 md:col-6 ">
     <div class="card">
       <h5>Cambio cuenta</h5>
-      <p-table [loading]="spinCambioCuenta" #tableCambioCuenta [value]="listCambioCuenta" dataKey="code" [rows]="10" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','id','movimiento','descripcion']"  [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinCambioCuenta" #tableCambioCuenta [value]="listCambioCuenta" dataKey="code" [rows]="10" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','descripcion']" [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableCambioCuenta)"></button>
@@ -284,8 +424,8 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Compra de saldo</h5>
-      <p-table [loading]="spinCompraSaldo" #tableCompraSaldo [value]="listCompraSaldo" dataKey="code" [rows]="10" (onFilter)="filtroCompraSaldo($event,tableCompraSaldo)" [paginator]="true" responsiveLayout="scroll"
-      [globalFilterFields]="['fecha','id','movimiento','descripcion','producto','valor']"  [rowsPerPageOptions]="[5,10,20,50]">
+      <p-table [loading]="spinCompraSaldo" #tableCompraSaldo [value]="listCompraSaldo" dataKey="code" [rows]="10" (onFilter)="filtroCompraSaldo($event,tableCompraSaldo)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','descripcion','producto','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableCompraSaldo)"></button>
@@ -357,6 +497,401 @@
           <tr>
             <td colspan="4">Promedio</td>
             <td>{{totalPromedioCompraSaldo | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-7">
+    <div class="card">
+      <h5>Renovación</h5>
+      <p-table [loading]="spinRenovacion" #tableRenovacion [value]="listRenovacion" dataKey="code" [rows]="10" (onFilter)="filtroRenovacion($event,tableRenovacion)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','producto','descripcion','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRenovacion)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="id">Id
+              <p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movimiento">Movimiento
+              <p-sortIcon field="movimiento"></p-sortIcon>
+            </th>
+            <th pSortableColumn="producto">Producto
+              <p-sortIcon field="producto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="descripcion">Descripcion
+              <p-sortIcon field="descripcion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoRenovacion"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getRenovacionFecha()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="id"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movimiento"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="producto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="descripcion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="valor"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.id }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.movimiento }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.producto }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.descripcion }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5">Total</td>
+            <td>{{totalRenovacion | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="5">Promedio</td>
+            <td>{{totalPromedioRenovacion | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-5">
+    <div class="card">
+      <h5>Comisión por renovación</h5>
+      <p-table [loading]="spinComisionPorRenovacion" #tableComisionRenovacion [value]="listComisionPorRenovacion" dataKey="code" [rows]="10" (onFilter)="filtroComisionRenovacion($event,tableComisionRenovacion)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','producto','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableComisionRenovacion)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="id">Id
+              <p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movimiento">Movimiento
+              <p-sortIcon field="movimiento"></p-sortIcon>
+            </th>
+            <th pSortableColumn="producto">Producto
+              <p-sortIcon field="producto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoComisionPorRenovacion"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getComisionRenovacionFecha()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="id"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movimiento"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="producto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="valor"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.id }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.movimiento }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.producto }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="4">Total</td>
+            <td>{{totalComisionPorRenovacion | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="4">Promedio</td>
+            <td>{{totalPromedioComisionPorRenovacion | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6">
+    <div class="card">
+      <h5>Devolución renovación</h5>
+      <p-table [loading]="spinDevolucionRenovacion" #tableDevolucionRenovacion [value]="listDevolucionRenovacion" dataKey="code" [rows]="10" (onFilter)="filtroDevolucionRenovacion($event,tableDevolucionRenovacion)" [paginator]="true" responsiveLayout="scroll"
+        [globalFilterFields]="['fecha','id','movimiento','producto','descripcion','valor']" [rowsPerPageOptions]="[5,10,20,50]">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableDevolucionRenovacion)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="id">Id
+              <p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movimiento">Movimiento
+              <p-sortIcon field="movimiento"></p-sortIcon>
+            </th>
+            <th pSortableColumn="producto">Producto
+              <p-sortIcon field="producto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="descripcion">Descripcion
+              <p-sortIcon field="descripcion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoDevolucionRenovacion"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getDevolucionRenovacionFecha()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="id"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movimiento"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="producto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="descripcion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="valor"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.id }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.movimiento }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.producto }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.descripcion }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5">Total</td>
+            <td>{{totalDevolucionRenovacion | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="5">Promedio</td>
+            <td>{{totalPromedioDevolucionRenovacion | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="8">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6">
+    <div class="card">
+      <h5>Recepción de saldo</h5>
+      <p-table [loading]="spinRecepcionSaldo" #tableRecepcionSaldo [value]="listRecepcionSaldo" dataKey="code" [rows]="10" (onFilter)="filtroRecepcionSaldo($event,tableRecepcionSaldo)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','producto','descripcion','valor']"
+        [rowsPerPageOptions]="[5,10,20,50]">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRecepcionSaldo)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha">Fecha
+              <p-sortIcon field="fecha"></p-sortIcon>
+            </th>
+            <th pSortableColumn="id">Id
+              <p-sortIcon field="id"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movimiento">Movimiento
+              <p-sortIcon field="movimiento"></p-sortIcon>
+            </th>
+            <th pSortableColumn="producto">Producto
+              <p-sortIcon field="producto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="descripcion">Descripcion
+              <p-sortIcon field="descripcion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="valor">Valor
+              <p-sortIcon field="valor"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoRecepcionSaldo"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getRecepcionSaldoFecha()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="id"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movimiento"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="producto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="descripcion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="valor"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">
+              {{data.fecha | date:'dd-MM-yyyy'}}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.id }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.movimiento }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.producto }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.descripcion }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.valor | currency:'$'}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5">Total</td>
+            <td>{{totalRecepcionSaldo| currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="5">Promedio</td>
+            <td>{{totalPromedioRecepcionSaldo | currency:'$'}}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

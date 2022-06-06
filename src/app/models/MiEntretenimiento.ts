@@ -10,3 +10,15 @@ export interface MiEn_Movimientos{
     fecha:string;
     tipo:string;
 }
+
+export interface MIEn_Indicadores{
+    fecha: string;
+    ventas: number;
+    cambio_cuenta: number;
+    comision_venta: number;
+    compra_saldo: number;
+    comision_renovacion: number;
+    renovacion: number;
+    devolucion_renovacion: number;
+    recepcion_saldo: number;
+}
