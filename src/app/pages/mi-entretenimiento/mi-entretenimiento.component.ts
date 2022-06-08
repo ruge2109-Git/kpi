@@ -484,7 +484,7 @@ export class MiEntretenimientoComponent implements OnInit {
                 }
             })
         }
-        this.saveMovimientos();
+        await this.saveMovimientos();
         this.initData();
     }
 
@@ -575,6 +575,9 @@ export class MiEntretenimientoComponent implements OnInit {
         }
         if (descripcionDB.includes('VENTA')) {
             return descripcionDB.split('VENTA ')[1].split(": [ ]")[1].trim();;
+        }
+        if (descripcionDB.includes('comisión por venta ')) {
+            return descripcionDB.split('comisión por venta ')[1].trim();;
         }
         return "";
     }

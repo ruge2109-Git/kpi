@@ -260,7 +260,8 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Comisión por venta</h5>
-      <p-table [loading]="spinComisionPorVenta" #tableComisionVenta [value]="listComisionPorVenta" dataKey="code" [rows]="10" (onFilter)="filtroComisionVentas($event,tableComisionVenta)" [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['fecha','id','movimiento','producto','valor']"
+      <p-table [loading]="spinComisionPorVenta" #tableComisionVenta [value]="listComisionPorVenta" dataKey="code" [rows]="10" (onFilter)="filtroComisionVentas($event,tableComisionVenta)" [paginator]="true" responsiveLayout="scroll"
+      [globalFilterFields]="['fecha','id','movimiento','producto','descripcion','valor']"
         [rowsPerPageOptions]="[5,10,20,50]">
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
@@ -280,6 +281,9 @@
             </th>
             <th pSortableColumn="producto">Producto
               <p-sortIcon field="producto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="descripcion">Descripcion
+              <p-sortIcon field="descripcion"></p-sortIcon>
             </th>
             <th pSortableColumn="valor">Valor
               <p-sortIcon field="valor"></p-sortIcon>
@@ -302,6 +306,9 @@
               <p-columnFilter type="text" field="producto"></p-columnFilter>
             </th>
             <th>
+              <p-columnFilter type="text" field="descripcion"></p-columnFilter>
+            </th>
+            <th>
               <p-columnFilter type="text" field="valor"></p-columnFilter>
             </th>
           </tr>
@@ -319,6 +326,9 @@
             </td>
             <td style="min-width: 12rem;">
               {{data.producto }}
+            </td>
+            <td style="min-width: 12rem;">
+              {{data.descripcion }}
             </td>
             <td style="min-width: 12rem;">
               {{data.valor | currency:'$'}}
