@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { EXA_Extracto_ahorro } from '../models/CtaAhorro';
+import { EXA_Extracto_ahorro } from '../../models/CtaAhorro';
 
 @Injectable({
     providedIn: 'root'

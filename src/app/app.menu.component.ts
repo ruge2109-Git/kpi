@@ -168,6 +168,14 @@ export class AppMenuComponent implements OnInit {
                             { label: 'Respuesta cuentas', icon: 'pi pi-fw pi-desktop', routerLink: ['/miEntretenimiento/rtaCuentas'] },
                         ]
                     },
+                    {
+                        label: 'Recargas JV',
+                        icon: 'pi pi-fw pi-desktop',
+                        items: [
+                            { label: 'Consumido', icon: 'pi pi-fw pi-desktop', routerLink: ['/webJV/Consumido'] },
+                            { label: 'Extracto', icon: 'pi pi-fw pi-desktop', routerLink: ['/webJV/extracto'] },
+                        ]
+                    },
                 ]
             }
         ];

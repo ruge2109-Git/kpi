@@ -1,0 +1,1802 @@
+<p-toast></p-toast>
+<h1 class="text-center">Recargas JV - Consumido</h1>
+
+<div class="grid">
+
+  <div class="col-12 md:col-6">
+    <div class="card">
+      <h5>Seleccione los archivos - Ganancias</h5>
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event,'ganancias')" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      </p-fileUpload>
+      <div class="mt-4" *ngIf="showProgressBarGanancias">
+        <h5>Barra de progreso</h5>
+        <p-progressBar [value]="valueProgressBarGanancias"></p-progressBar>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-6">
+    <div class="card">
+      <h5>Seleccione los archivos - Recargas</h5>
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event,'recargas')" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      </p-fileUpload>
+      <div class="mt-4" *ngIf="showProgressBarRecargas">
+        <h5>Barra de progreso</h5>
+        <p-progressBar [value]="valueProgressBarRecargas"></p-progressBar>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <h5>Seleccione los archivos - Saldo</h5>
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event,'saldo')" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      </p-fileUpload>
+      <div class="mt-4" *ngIf="showProgressBarSaldo">
+        <h5>Barra de progreso</h5>
+        <p-progressBar [value]="valueProgressBarSaldo"></p-progressBar>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="grid">
+    <div class="col-12">
+      <div class="card">
+        <h5>Indicadores</h5>
+        <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroIndicadores($event)">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-content-between flex-column sm:flex-row">
+              <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIndicadores)"></button>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="fecha_cargue">Fecha
+                <p-sortIcon field="fecha_cargue"></p-sortIcon>
+              </th>
+              <th pSortableColumn="ganancias">Ganancias
+                <p-sortIcon field="ganancias"></p-sortIcon>
+              </th>
+              <th pSortableColumn="saldos">Saldos
+                <p-sortIcon field="saldos"></p-sortIcon>
+              </th>
+              <th pSortableColumn="recargas">Recargas
+                <p-sortIcon field="recargas"></p-sortIcon>
+              </th>
+
+            </tr>
+            <tr>
+              <th>
+                <div class="flex justify-content-between flex-column sm:flex-row">
+                  <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasIndicadores"></p-calendar>
+                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getIndicadoresFechas()"></button>
+                </div>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="ganancias"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="saldos"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="recargas"></p-columnFilter>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-data>
+            <tr>
+              <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
+              <td style="min-width: 12rem;">{{data.ganancias | currency:'$' }}</td>
+              <td style="min-width: 12rem;">{{data.saldos | currency:'$'}}</td>
+              <td style="min-width: 12rem;">{{data.recargas | currency:'$'}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td>Total</td>
+              <td>{{totalGanancias | currency:'$'}}</td>
+              <td>{{totalSaldos | currency:'$'}}</td>
+              <td>{{totalRecargas | currency:'$'}}</td>
+            </tr>
+            <tr>
+              <td>Promedio</td>
+              <td>{{promedioGanancias | currency:'$'}}</td>
+              <td>{{promedioSaldos | currency:'$'}}</td>
+              <td>{{promedioRecargas | currency:'$'}}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="100">Sin registros</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="loadingbody">
+            <tr>
+              <td colspan="100">Cargando información, por favor espere</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h5>Ganancias</h5>
+      <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinGanancias" #tableGanancias [value]="listGanancias" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroGanancias($event)">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableGanancias)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha_cargue">fecha_cargue
+              <p-sortIcon field="fecha_cargue"></p-sortIcon>
+            </th>
+            <th pSortableColumn="nombre">nombre
+              <p-sortIcon field="nombre"></p-sortIcon>
+            </th>
+            <th pSortableColumn="codigo_cliente">codigo_cliente
+              <p-sortIcon field="codigo_cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cc">cc
+              <p-sortIcon field="cc"></p-sortIcon>
+            </th>
+            <th pSortableColumn="perfil">perfil
+              <p-sortIcon field="perfil"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_pago_tarjeta_de_credito">davivienda_pago_tarjeta_de_credito
+              <p-sortIcon field="davivienda_pago_tarjeta_de_credito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_pago_de_credito">davivienda_pago_de_credito
+              <p-sortIcon field="davivienda_pago_de_credito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_deposito_davivienda">davivienda_deposito_davivienda
+              <p-sortIcon field="davivienda_deposito_davivienda"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_retiro_davivienda">davivienda_retiro_davivienda
+              <p-sortIcon field="davivienda_retiro_davivienda"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_tarjeta_de_credito_ban_bogota">aval_tarjeta_de_credito_ban_bogota
+              <p-sortIcon field="aval_tarjeta_de_credito_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota">aval_cred_rotativo_crediservices_dinero_extra_ban_bogota
+              <p-sortIcon field="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_credito_hipotecario_ban_bogota">aval_credito_hipotecario_ban_bogota
+              <p-sortIcon field="aval_credito_hipotecario_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_otros_creditos_ban_bogota">aval_otros_creditos_ban_bogota
+              <p-sortIcon field="aval_otros_creditos_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_credito_motos_vehiculos_ban_bogota">aval_credito_motos_vehiculos_ban_bogota
+              <p-sortIcon field="aval_credito_motos_vehiculos_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="xbox_plata">xbox_plata
+              <p-sortIcon field="xbox_plata"></p-sortIcon>
+            </th>
+            <th pSortableColumn="imvu">imvu
+              <p-sortIcon field="imvu"></p-sortIcon>
+            </th>
+            <th pSortableColumn="keo">keo
+              <p-sortIcon field="keo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sisteCredito">sisteCredito
+              <p-sortIcon field="sisteCredito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="claro">claro
+              <p-sortIcon field="claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_claro">paquetes_claro
+              <p-sortIcon field="paquetes_claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sura">sura
+              <p-sortIcon field="sura"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movistar">movistar
+              <p-sortIcon field="movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_movistar">paquetes_movistar
+              <p-sortIcon field="paquetes_movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tigo">tigo
+              <p-sortIcon field="tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_tigo">paquetes_tigo
+              <p-sortIcon field="paquetes_tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="avantel">avantel
+              <p-sortIcon field="avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_avantel">paquetes_avantel
+              <p-sortIcon field="paquetes_avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="virgin">virgin
+              <p-sortIcon field="virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_virgin">paquetes_virgin
+              <p-sortIcon field="paquetes_virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="etb">etb
+              <p-sortIcon field="etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquete_etb">paquete_etb
+              <p-sortIcon field="paquete_etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="exito">exito
+              <p-sortIcon field="exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_exito">paquetes_exito
+              <p-sortIcon field="paquetes_exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_conectame">paquetes_conectame
+              <p-sortIcon field="paquetes_conectame"></p-sortIcon>
+            </th>
+            <th pSortableColumn="flashMobile">flashMobile
+              <p-sortIcon field="flashMobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="direcTv">direcTv
+              <p-sortIcon field="direcTv"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wom">wom
+              <p-sortIcon field="wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_wom">paquetes_wom
+              <p-sortIcon field="paquetes_wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="kalley_mobile">kalley_mobile
+              <p-sortIcon field="kalley_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_kalley_mobile">paquetes_kalley_mobile
+              <p-sortIcon field="paquetes_kalley_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wings_mobile">wings_mobile
+              <p-sortIcon field="wings_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_wings_mobile">paquetes_wings_mobile
+              <p-sortIcon field="paquetes_wings_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="unicorn">unicorn
+              <p-sortIcon field="unicorn"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wplay">wplay
+              <p-sortIcon field="wplay"></p-sortIcon>
+            </th>
+            <th pSortableColumn="mega_apuesta">mega_apuesta
+              <p-sortIcon field="mega_apuesta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ya_juego">ya_juego
+              <p-sortIcon field="ya_juego"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aqui_juego">aqui_juego
+              <p-sortIcon field="aqui_juego"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rushBet">rushBet
+              <p-sortIcon field="rushBet"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rivalo">rivalo
+              <p-sortIcon field="rivalo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="miJugada">miJugada
+              <p-sortIcon field="miJugada"></p-sortIcon>
+            </th>
+            <th pSortableColumn="facturas_otros">facturas_otros
+              <p-sortIcon field="facturas_otros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="facturas_de_gas_energia">facturas_de_gas_energia
+              <p-sortIcon field="facturas_de_gas_energia"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sms">sms
+              <p-sortIcon field="sms"></p-sortIcon>
+            </th>
+            <th pSortableColumn="baloto">baloto
+              <p-sortIcon field="baloto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="baloto_pago_de_premios">baloto_pago_de_premios
+              <p-sortIcon field="baloto_pago_de_premios"></p-sortIcon>
+            </th>
+            <th pSortableColumn="certificado_de_tradicion">certificado_de_tradicion
+              <p-sortIcon field="certificado_de_tradicion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="runt">runt
+              <p-sortIcon field="runt"></p-sortIcon>
+            </th>
+            <th pSortableColumn="energia_prepago_essa">energia_prepago_essa
+              <p-sortIcon field="energia_prepago_essa"></p-sortIcon>
+            </th>
+            <th pSortableColumn="energia_Prepago_epm">energia_Prepago_epm
+              <p-sortIcon field="energia_Prepago_epm"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_moto_estado">soat_moto_estado
+              <p-sortIcon field="soat_moto_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_carro_estado">soat_carro_estado
+              <p-sortIcon field="soat_carro_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_bus_estado">soat_bus_estado
+              <p-sortIcon field="soat_bus_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_moto">axa_soat_moto
+              <p-sortIcon field="axa_soat_moto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_carro">axa_soat_carro
+              <p-sortIcon field="axa_soat_carro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_publico">axa_soat_publico
+              <p-sortIcon field="axa_soat_publico"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movii_recargas">movii_recargas
+              <p-sortIcon field="movii_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movii_retiros">movii_retiros
+              <p-sortIcon field="movii_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="daviplata_recargas">daviplata_recargas
+              <p-sortIcon field="daviplata_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="daviplata_retiros">daviplata_retiros
+              <p-sortIcon field="daviplata_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="taxia_recargas">taxia_recargas
+              <p-sortIcon field="taxia_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tpaga_retiros">tpaga_retiros
+              <p-sortIcon field="tpaga_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="razer_gold">razer_gold
+              <p-sortIcon field="razer_gold"></p-sortIcon>
+            </th>
+            <th pSortableColumn="netflix">netflix
+              <p-sortIcon field="netflix"></p-sortIcon>
+            </th>
+            <th pSortableColumn="spotify">spotify
+              <p-sortIcon field="spotify"></p-sortIcon>
+            </th>
+            <th pSortableColumn="payValida">payValida
+              <p-sortIcon field="payValida"></p-sortIcon>
+            </th>
+            <th pSortableColumn="freeFire">freeFire
+              <p-sortIcon field="freeFire"></p-sortIcon>
+            </th>
+            <th pSortableColumn="noggin">noggin
+              <p-sortIcon field="noggin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="crunchyroll">crunchyroll
+              <p-sortIcon field="crunchyroll"></p-sortIcon>
+            </th>
+            <th pSortableColumn="office">office
+              <p-sortIcon field="office"></p-sortIcon>
+            </th>
+            <th pSortableColumn="win_sport">win_sport
+              <p-sortIcon field="win_sport"></p-sortIcon>
+            </th>
+            <th pSortableColumn="dataCredito">dataCredito
+              <p-sortIcon field="dataCredito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paramount">paramount
+              <p-sortIcon field="paramount"></p-sortIcon>
+            </th>
+            <th pSortableColumn="xbox_suscripciones">xbox_suscripciones
+              <p-sortIcon field="xbox_suscripciones"></p-sortIcon>
+            </th>
+            <th pSortableColumn="play_station">play_station
+              <p-sortIcon field="play_station"></p-sortIcon>
+            </th>
+            <th pSortableColumn="play_station_suscripciones">play_station_suscripciones
+              <p-sortIcon field="play_station_suscripciones"></p-sortIcon>
+            </th>
+            <th pSortableColumn="minecraft">minecraft
+              <p-sortIcon field="minecraft"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rixty">rixty
+              <p-sortIcon field="rixty"></p-sortIcon>
+            </th>
+            <th pSortableColumn="payCash">payCash
+              <p-sortIcon field="payCash"></p-sortIcon>
+            </th>
+            <th pSortableColumn="total">total
+              <p-sortIcon field="total"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasGanancias"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getGananciasFechas()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="nombre"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="codigo_cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="cc"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="perfil"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_pago_tarjeta_de_credito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_pago_de_credito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_deposito_davivienda"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_retiro_davivienda"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_tarjeta_de_credito_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_credito_hipotecario_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_otros_creditos_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_credito_motos_vehiculos_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="xbox_plata"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="imvu"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="keo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sisteCredito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sura"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquete_etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_conectame"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="flashMobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="direcTv"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="kalley_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_kalley_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wings_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_wings_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="unicorn"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wplay"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="mega_apuesta"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="ya_juego"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aqui_juego"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rushBet"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rivalo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="miJugada"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="facturas_otros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="facturas_de_gas_energia"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sms"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="baloto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="baloto_pago_de_premios"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="certificado_de_tradicion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="runt"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="energia_prepago_essa"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="energia_Prepago_epm"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_moto_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_carro_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_bus_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_moto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_carro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_publico"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movii_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movii_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="daviplata_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="daviplata_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="taxia_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="tpaga_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="razer_gold"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="netflix"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="spotify"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="payValida"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="freeFire"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="noggin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="crunchyroll"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="office"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="win_sport"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="dataCredito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paramount"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="xbox_suscripciones"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="play_station"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="play_station_suscripciones"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="minecraft"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rixty"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="payCash"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="total"></p-columnFilter>
+            </th>
+
+
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
+            <td style="min-width: 12rem;">{{data.nombre }}</td>
+            <td style="min-width: 12rem;">{{data.codigo_cliente }}</td>
+            <td style="min-width: 12rem;">{{data.cc }}</td>
+            <td style="min-width: 12rem;">{{data.perfil }}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_pago_de_credito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.xbox_plata | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.imvu | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.keo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sisteCredito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sura | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquete_etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_conectame | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.flashMobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.direcTv | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.kalley_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_kalley_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wings_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_wings_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.unicorn | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wplay | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.mega_apuesta | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.ya_juego | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aqui_juego | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rushBet | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rivalo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.miJugada | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.facturas_otros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.facturas_de_gas_energia | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sms | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.baloto | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.baloto_pago_de_premios | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.certificado_de_tradicion | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.runt | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.energia_prepago_essa | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.energia_Prepago_epm | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_moto_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_carro_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_bus_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_moto | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_carro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_publico | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movii_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movii_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.daviplata_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.daviplata_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.taxia_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.tpaga_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.razer_gold | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.netflix | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.spotify | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.payValida | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.freeFire | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.noggin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.crunchyroll | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.office | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.win_sport | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.dataCredito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paramount | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.xbox_suscripciones | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.play_station | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.play_station_suscripciones | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.minecraft | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rixty | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.payCash | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.total | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5">Total</td>
+            <td>{{total_davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td>{{total_davivienda_pago_de_credito | currency:'$'}}</td>
+            <td>{{total_davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td>{{total_davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td>{{total_aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td>{{total_aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td>{{total_aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td>{{total_aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td>{{total_aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td>{{total_xbox_plata | currency:'$'}}</td>
+            <td>{{total_imvu | currency:'$'}}</td>
+            <td>{{total_keo | currency:'$'}}</td>
+            <td>{{total_sisteCredito | currency:'$'}}</td>
+            <td>{{total_claro | currency:'$'}}</td>
+            <td>{{total_paquetes_claro | currency:'$'}}</td>
+            <td>{{total_sura | currency:'$'}}</td>
+            <td>{{total_movistar | currency:'$'}}</td>
+            <td>{{total_paquetes_movistar | currency:'$'}}</td>
+            <td>{{total_tigo | currency:'$'}}</td>
+            <td>{{total_paquetes_tigo | currency:'$'}}</td>
+            <td>{{total_avantel | currency:'$'}}</td>
+            <td>{{total_paquetes_avantel | currency:'$'}}</td>
+            <td>{{total_virgin | currency:'$'}}</td>
+            <td>{{total_paquetes_virgin | currency:'$'}}</td>
+            <td>{{total_etb | currency:'$'}}</td>
+            <td>{{total_paquete_etb | currency:'$'}}</td>
+            <td>{{total_exito | currency:'$'}}</td>
+            <td>{{total_paquetes_exito | currency:'$'}}</td>
+            <td>{{total_paquetes_conectame | currency:'$'}}</td>
+            <td>{{total_flashMobile | currency:'$'}}</td>
+            <td>{{total_direcTv | currency:'$'}}</td>
+            <td>{{total_wom | currency:'$'}}</td>
+            <td>{{total_paquetes_wom | currency:'$'}}</td>
+            <td>{{total_kalley_mobile | currency:'$'}}</td>
+            <td>{{total_paquetes_kalley_mobile | currency:'$'}}</td>
+            <td>{{total_wings_mobile | currency:'$'}}</td>
+            <td>{{total_paquetes_wings_mobile | currency:'$'}}</td>
+            <td>{{total_unicorn | currency:'$'}}</td>
+            <td>{{total_wplay | currency:'$'}}</td>
+            <td>{{total_mega_apuesta | currency:'$'}}</td>
+            <td>{{total_ya_juego | currency:'$'}}</td>
+            <td>{{total_aqui_juego | currency:'$'}}</td>
+            <td>{{total_rushBet | currency:'$'}}</td>
+            <td>{{total_rivalo | currency:'$'}}</td>
+            <td>{{total_miJugada | currency:'$'}}</td>
+            <td>{{total_facturas_otros | currency:'$'}}</td>
+            <td>{{total_facturas_de_gas_energia | currency:'$'}}</td>
+            <td>{{total_sms | currency:'$'}}</td>
+            <td>{{total_baloto | currency:'$'}}</td>
+            <td>{{total_baloto_pago_de_premios | currency:'$'}}</td>
+            <td>{{total_certificado_de_tradicion | currency:'$'}}</td>
+            <td>{{total_runt | currency:'$'}}</td>
+            <td>{{total_energia_prepago_essa | currency:'$'}}</td>
+            <td>{{total_energia_Prepago_epm | currency:'$'}}</td>
+            <td>{{total_soat_moto_estado | currency:'$'}}</td>
+            <td>{{total_soat_carro_estado | currency:'$'}}</td>
+            <td>{{total_soat_bus_estado | currency:'$'}}</td>
+            <td>{{total_axa_soat_moto | currency:'$'}}</td>
+            <td>{{total_axa_soat_carro | currency:'$'}}</td>
+            <td>{{total_axa_soat_publico | currency:'$'}}</td>
+            <td>{{total_movii_recargas | currency:'$'}}</td>
+            <td>{{total_movii_retiros | currency:'$'}}</td>
+            <td>{{total_daviplata_recargas | currency:'$'}}</td>
+            <td>{{total_daviplata_retiros | currency:'$'}}</td>
+            <td>{{total_taxia_recargas | currency:'$'}}</td>
+            <td>{{total_tpaga_retiros | currency:'$'}}</td>
+            <td>{{total_razer_gold | currency:'$'}}</td>
+            <td>{{total_netflix | currency:'$'}}</td>
+            <td>{{total_spotify | currency:'$'}}</td>
+            <td>{{total_payValida | currency:'$'}}</td>
+            <td>{{total_freeFire | currency:'$'}}</td>
+            <td>{{total_noggin | currency:'$'}}</td>
+            <td>{{total_crunchyroll | currency:'$'}}</td>
+            <td>{{total_office | currency:'$'}}</td>
+            <td>{{total_win_sport | currency:'$'}}</td>
+            <td>{{total_dataCredito | currency:'$'}}</td>
+            <td>{{total_paramount | currency:'$'}}</td>
+            <td>{{total_xbox_suscripciones | currency:'$'}}</td>
+            <td>{{total_play_station | currency:'$'}}</td>
+            <td>{{total_play_station_suscripciones | currency:'$'}}</td>
+            <td>{{total_minecraft | currency:'$'}}</td>
+            <td>{{total_rixty | currency:'$'}}</td>
+            <td>{{total_payCash | currency:'$'}}</td>
+            <td>{{total_total | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="5">Promedio</td>
+            <td>{{promedio_davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td>{{promedio_davivienda_pago_de_credito | currency:'$'}}</td>
+            <td>{{promedio_davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td>{{promedio_davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td>{{promedio_aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_xbox_plata | currency:'$'}}</td>
+            <td>{{promedio_imvu | currency:'$'}}</td>
+            <td>{{promedio_keo | currency:'$'}}</td>
+            <td>{{promedio_sisteCredito | currency:'$'}}</td>
+            <td>{{promedio_claro | currency:'$'}}</td>
+            <td>{{promedio_paquetes_claro | currency:'$'}}</td>
+            <td>{{promedio_sura | currency:'$'}}</td>
+            <td>{{promedio_movistar | currency:'$'}}</td>
+            <td>{{promedio_paquetes_movistar | currency:'$'}}</td>
+            <td>{{promedio_tigo | currency:'$'}}</td>
+            <td>{{promedio_paquetes_tigo | currency:'$'}}</td>
+            <td>{{promedio_avantel | currency:'$'}}</td>
+            <td>{{promedio_paquetes_avantel | currency:'$'}}</td>
+            <td>{{promedio_virgin | currency:'$'}}</td>
+            <td>{{promedio_paquetes_virgin | currency:'$'}}</td>
+            <td>{{promedio_etb | currency:'$'}}</td>
+            <td>{{promedio_paquete_etb | currency:'$'}}</td>
+            <td>{{promedio_exito | currency:'$'}}</td>
+            <td>{{promedio_paquetes_exito | currency:'$'}}</td>
+            <td>{{promedio_paquetes_conectame | currency:'$'}}</td>
+            <td>{{promedio_flashMobile | currency:'$'}}</td>
+            <td>{{promedio_direcTv | currency:'$'}}</td>
+            <td>{{promedio_wom | currency:'$'}}</td>
+            <td>{{promedio_paquetes_wom | currency:'$'}}</td>
+            <td>{{promedio_kalley_mobile | currency:'$'}}</td>
+            <td>{{promedio_paquetes_kalley_mobile | currency:'$'}}</td>
+            <td>{{promedio_wings_mobile | currency:'$'}}</td>
+            <td>{{promedio_paquetes_wings_mobile | currency:'$'}}</td>
+            <td>{{promedio_unicorn | currency:'$'}}</td>
+            <td>{{promedio_wplay | currency:'$'}}</td>
+            <td>{{promedio_mega_apuesta | currency:'$'}}</td>
+            <td>{{promedio_ya_juego | currency:'$'}}</td>
+            <td>{{promedio_aqui_juego | currency:'$'}}</td>
+            <td>{{promedio_rushBet | currency:'$'}}</td>
+            <td>{{promedio_rivalo | currency:'$'}}</td>
+            <td>{{promedio_miJugada | currency:'$'}}</td>
+            <td>{{promedio_facturas_otros | currency:'$'}}</td>
+            <td>{{promedio_facturas_de_gas_energia | currency:'$'}}</td>
+            <td>{{promedio_sms | currency:'$'}}</td>
+            <td>{{promedio_baloto | currency:'$'}}</td>
+            <td>{{promedio_baloto_pago_de_premios | currency:'$'}}</td>
+            <td>{{promedio_certificado_de_tradicion | currency:'$'}}</td>
+            <td>{{promedio_runt | currency:'$'}}</td>
+            <td>{{promedio_energia_prepago_essa | currency:'$'}}</td>
+            <td>{{promedio_energia_Prepago_epm | currency:'$'}}</td>
+            <td>{{promedio_soat_moto_estado | currency:'$'}}</td>
+            <td>{{promedio_soat_carro_estado | currency:'$'}}</td>
+            <td>{{promedio_soat_bus_estado | currency:'$'}}</td>
+            <td>{{promedio_axa_soat_moto | currency:'$'}}</td>
+            <td>{{promedio_axa_soat_carro | currency:'$'}}</td>
+            <td>{{promedio_axa_soat_publico | currency:'$'}}</td>
+            <td>{{promedio_movii_recargas | currency:'$'}}</td>
+            <td>{{promedio_movii_retiros | currency:'$'}}</td>
+            <td>{{promedio_daviplata_recargas | currency:'$'}}</td>
+            <td>{{promedio_daviplata_retiros | currency:'$'}}</td>
+            <td>{{promedio_taxia_recargas | currency:'$'}}</td>
+            <td>{{promedio_tpaga_retiros | currency:'$'}}</td>
+            <td>{{promedio_razer_gold | currency:'$'}}</td>
+            <td>{{promedio_netflix | currency:'$'}}</td>
+            <td>{{promedio_spotify | currency:'$'}}</td>
+            <td>{{promedio_payValida | currency:'$'}}</td>
+            <td>{{promedio_freeFire | currency:'$'}}</td>
+            <td>{{promedio_noggin | currency:'$'}}</td>
+            <td>{{promedio_crunchyroll | currency:'$'}}</td>
+            <td>{{promedio_office | currency:'$'}}</td>
+            <td>{{promedio_win_sport | currency:'$'}}</td>
+            <td>{{promedio_dataCredito | currency:'$'}}</td>
+            <td>{{promedio_paramount | currency:'$'}}</td>
+            <td>{{promedio_xbox_suscripciones | currency:'$'}}</td>
+            <td>{{promedio_play_station | currency:'$'}}</td>
+            <td>{{promedio_play_station_suscripciones | currency:'$'}}</td>
+            <td>{{promedio_minecraft | currency:'$'}}</td>
+            <td>{{promedio_rixty | currency:'$'}}</td>
+            <td>{{promedio_payCash | currency:'$'}}</td>
+            <td>{{promedio_total | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="100">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h5>Saldos</h5>
+      <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinSaldo" #tableSaldos [value]="listSaldo" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroSaldos($event)">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableSaldos)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha_cargue">fecha_cargue
+              <p-sortIcon field="fecha_cargue"></p-sortIcon>
+            </th>
+            <th pSortableColumn="nombre">nombre
+              <p-sortIcon field="nombre"></p-sortIcon>
+            </th>
+            <th pSortableColumn="codigo_cliente">codigo_cliente
+              <p-sortIcon field="codigo_cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cc">cc
+              <p-sortIcon field="cc"></p-sortIcon>
+            </th>
+            <th pSortableColumn="perfil">perfil
+              <p-sortIcon field="perfil"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_pago_tarjeta_de_credito">davivienda_pago_tarjeta_de_credito
+              <p-sortIcon field="davivienda_pago_tarjeta_de_credito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_pago_de_credito">davivienda_pago_de_credito
+              <p-sortIcon field="davivienda_pago_de_credito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_deposito_davivienda">davivienda_deposito_davivienda
+              <p-sortIcon field="davivienda_deposito_davivienda"></p-sortIcon>
+            </th>
+            <th pSortableColumn="davivienda_retiro_davivienda">davivienda_retiro_davivienda
+              <p-sortIcon field="davivienda_retiro_davivienda"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_tarjeta_de_credito_ban_bogota">aval_tarjeta_de_credito_ban_bogota
+              <p-sortIcon field="aval_tarjeta_de_credito_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota">aval_cred_rotativo_crediservices_dinero_extra_ban_bogota
+              <p-sortIcon field="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_credito_hipotecario_ban_bogota">aval_credito_hipotecario_ban_bogota
+              <p-sortIcon field="aval_credito_hipotecario_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_otros_creditos_ban_bogota">aval_otros_creditos_ban_bogota
+              <p-sortIcon field="aval_otros_creditos_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aval_credito_motos_vehiculos_ban_bogota">aval_credito_motos_vehiculos_ban_bogota
+              <p-sortIcon field="aval_credito_motos_vehiculos_ban_bogota"></p-sortIcon>
+            </th>
+            <th pSortableColumn="xbox_plata">xbox_plata
+              <p-sortIcon field="xbox_plata"></p-sortIcon>
+            </th>
+            <th pSortableColumn="imvu">imvu
+              <p-sortIcon field="imvu"></p-sortIcon>
+            </th>
+            <th pSortableColumn="keo">keo
+              <p-sortIcon field="keo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sisteCredito">sisteCredito
+              <p-sortIcon field="sisteCredito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="claro">claro
+              <p-sortIcon field="claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_claro">paquetes_claro
+              <p-sortIcon field="paquetes_claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sura">sura
+              <p-sortIcon field="sura"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movistar">movistar
+              <p-sortIcon field="movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_movistar">paquetes_movistar
+              <p-sortIcon field="paquetes_movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tigo">tigo
+              <p-sortIcon field="tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_tigo">paquetes_tigo
+              <p-sortIcon field="paquetes_tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="avantel">avantel
+              <p-sortIcon field="avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_avantel">paquetes_avantel
+              <p-sortIcon field="paquetes_avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="virgin">virgin
+              <p-sortIcon field="virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_virgin">paquetes_virgin
+              <p-sortIcon field="paquetes_virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="etb">etb
+              <p-sortIcon field="etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquete_etb">paquete_etb
+              <p-sortIcon field="paquete_etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="exito">exito
+              <p-sortIcon field="exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_exito">paquetes_exito
+              <p-sortIcon field="paquetes_exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_conectame">paquetes_conectame
+              <p-sortIcon field="paquetes_conectame"></p-sortIcon>
+            </th>
+            <th pSortableColumn="flashMobile">flashMobile
+              <p-sortIcon field="flashMobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="direcTv">direcTv
+              <p-sortIcon field="direcTv"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wom">wom
+              <p-sortIcon field="wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_wom">paquetes_wom
+              <p-sortIcon field="paquetes_wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="kalley_mobile">kalley_mobile
+              <p-sortIcon field="kalley_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_kalley_mobile">paquetes_kalley_mobile
+              <p-sortIcon field="paquetes_kalley_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wings_mobile">wings_mobile
+              <p-sortIcon field="wings_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_wings_mobile">paquetes_wings_mobile
+              <p-sortIcon field="paquetes_wings_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="unicorn">unicorn
+              <p-sortIcon field="unicorn"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wplay">wplay
+              <p-sortIcon field="wplay"></p-sortIcon>
+            </th>
+            <th pSortableColumn="mega_apuesta">mega_apuesta
+              <p-sortIcon field="mega_apuesta"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ya_juego">ya_juego
+              <p-sortIcon field="ya_juego"></p-sortIcon>
+            </th>
+            <th pSortableColumn="aqui_juego">aqui_juego
+              <p-sortIcon field="aqui_juego"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rushBet">rushBet
+              <p-sortIcon field="rushBet"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rivalo">rivalo
+              <p-sortIcon field="rivalo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="miJugada">miJugada
+              <p-sortIcon field="miJugada"></p-sortIcon>
+            </th>
+            <th pSortableColumn="facturas_otros">facturas_otros
+              <p-sortIcon field="facturas_otros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="facturas_de_gas_energia">facturas_de_gas_energia
+              <p-sortIcon field="facturas_de_gas_energia"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sms">sms
+              <p-sortIcon field="sms"></p-sortIcon>
+            </th>
+            <th pSortableColumn="baloto">baloto
+              <p-sortIcon field="baloto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="baloto_pago_de_premios">baloto_pago_de_premios
+              <p-sortIcon field="baloto_pago_de_premios"></p-sortIcon>
+            </th>
+            <th pSortableColumn="certificado_de_tradicion">certificado_de_tradicion
+              <p-sortIcon field="certificado_de_tradicion"></p-sortIcon>
+            </th>
+            <th pSortableColumn="runt">runt
+              <p-sortIcon field="runt"></p-sortIcon>
+            </th>
+            <th pSortableColumn="energia_prepago_essa">energia_prepago_essa
+              <p-sortIcon field="energia_prepago_essa"></p-sortIcon>
+            </th>
+            <th pSortableColumn="energia_Prepago_epm">energia_Prepago_epm
+              <p-sortIcon field="energia_Prepago_epm"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_moto_estado">soat_moto_estado
+              <p-sortIcon field="soat_moto_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_carro_estado">soat_carro_estado
+              <p-sortIcon field="soat_carro_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="soat_bus_estado">soat_bus_estado
+              <p-sortIcon field="soat_bus_estado"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_moto">axa_soat_moto
+              <p-sortIcon field="axa_soat_moto"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_carro">axa_soat_carro
+              <p-sortIcon field="axa_soat_carro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="axa_soat_publico">axa_soat_publico
+              <p-sortIcon field="axa_soat_publico"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movii_recargas">movii_recargas
+              <p-sortIcon field="movii_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movii_retiros">movii_retiros
+              <p-sortIcon field="movii_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="daviplata_recargas">daviplata_recargas
+              <p-sortIcon field="daviplata_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="daviplata_retiros">daviplata_retiros
+              <p-sortIcon field="daviplata_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="taxia_recargas">taxia_recargas
+              <p-sortIcon field="taxia_recargas"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tpaga_retiros">tpaga_retiros
+              <p-sortIcon field="tpaga_retiros"></p-sortIcon>
+            </th>
+            <th pSortableColumn="razer_gold">razer_gold
+              <p-sortIcon field="razer_gold"></p-sortIcon>
+            </th>
+            <th pSortableColumn="netflix">netflix
+              <p-sortIcon field="netflix"></p-sortIcon>
+            </th>
+            <th pSortableColumn="spotify">spotify
+              <p-sortIcon field="spotify"></p-sortIcon>
+            </th>
+            <th pSortableColumn="payValida">payValida
+              <p-sortIcon field="payValida"></p-sortIcon>
+            </th>
+            <th pSortableColumn="freeFire">freeFire
+              <p-sortIcon field="freeFire"></p-sortIcon>
+            </th>
+            <th pSortableColumn="noggin">noggin
+              <p-sortIcon field="noggin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="crunchyroll">crunchyroll
+              <p-sortIcon field="crunchyroll"></p-sortIcon>
+            </th>
+            <th pSortableColumn="office">office
+              <p-sortIcon field="office"></p-sortIcon>
+            </th>
+            <th pSortableColumn="win_sport">win_sport
+              <p-sortIcon field="win_sport"></p-sortIcon>
+            </th>
+            <th pSortableColumn="dataCredito">dataCredito
+              <p-sortIcon field="dataCredito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paramount">paramount
+              <p-sortIcon field="paramount"></p-sortIcon>
+            </th>
+            <th pSortableColumn="xbox_suscripciones">xbox_suscripciones
+              <p-sortIcon field="xbox_suscripciones"></p-sortIcon>
+            </th>
+            <th pSortableColumn="play_station">play_station
+              <p-sortIcon field="play_station"></p-sortIcon>
+            </th>
+            <th pSortableColumn="play_station_suscripciones">play_station_suscripciones
+              <p-sortIcon field="play_station_suscripciones"></p-sortIcon>
+            </th>
+            <th pSortableColumn="minecraft">minecraft
+              <p-sortIcon field="minecraft"></p-sortIcon>
+            </th>
+            <th pSortableColumn="rixty">rixty
+              <p-sortIcon field="rixty"></p-sortIcon>
+            </th>
+            <th pSortableColumn="payCash">payCash
+              <p-sortIcon field="payCash"></p-sortIcon>
+            </th>
+            <th pSortableColumn="total">total
+              <p-sortIcon field="total"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasSaldos"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getSaldosFechas()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="nombre"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="codigo_cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="cc"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="perfil"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_pago_tarjeta_de_credito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_pago_de_credito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_deposito_davivienda"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="davivienda_retiro_davivienda"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_tarjeta_de_credito_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_cred_rotativo_crediservices_dinero_extra_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_credito_hipotecario_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_otros_creditos_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aval_credito_motos_vehiculos_ban_bogota"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="xbox_plata"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="imvu"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="keo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sisteCredito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sura"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquete_etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_conectame"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="flashMobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="direcTv"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="kalley_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_kalley_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wings_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_wings_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="unicorn"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wplay"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="mega_apuesta"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="ya_juego"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="aqui_juego"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rushBet"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rivalo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="miJugada"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="facturas_otros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="facturas_de_gas_energia"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sms"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="baloto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="baloto_pago_de_premios"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="certificado_de_tradicion"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="runt"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="energia_prepago_essa"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="energia_Prepago_epm"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_moto_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_carro_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="soat_bus_estado"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_moto"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_carro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="axa_soat_publico"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movii_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movii_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="daviplata_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="daviplata_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="taxia_recargas"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="tpaga_retiros"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="razer_gold"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="netflix"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="spotify"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="payValida"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="freeFire"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="noggin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="crunchyroll"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="office"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="win_sport"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="dataCredito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paramount"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="xbox_suscripciones"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="play_station"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="play_station_suscripciones"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="minecraft"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="rixty"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="payCash"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="total"></p-columnFilter>
+            </th>
+
+
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
+            <td style="min-width: 12rem;">{{data.nombre }}</td>
+            <td style="min-width: 12rem;">{{data.codigo_cliente }}</td>
+            <td style="min-width: 12rem;">{{data.cc }}</td>
+            <td style="min-width: 12rem;">{{data.perfil }}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_pago_de_credito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.xbox_plata | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.imvu | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.keo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sisteCredito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sura | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquete_etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_conectame | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.flashMobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.direcTv | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.kalley_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_kalley_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wings_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_wings_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.unicorn | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wplay | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.mega_apuesta | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.ya_juego | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.aqui_juego | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rushBet | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rivalo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.miJugada | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.facturas_otros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.facturas_de_gas_energia | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sms | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.baloto | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.baloto_pago_de_premios | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.certificado_de_tradicion | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.runt | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.energia_prepago_essa | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.energia_Prepago_epm | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_moto_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_carro_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.soat_bus_estado | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_moto | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_carro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.axa_soat_publico | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movii_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movii_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.daviplata_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.daviplata_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.taxia_recargas | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.tpaga_retiros | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.razer_gold | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.netflix | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.spotify | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.payValida | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.freeFire | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.noggin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.crunchyroll | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.office | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.win_sport | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.dataCredito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paramount | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.xbox_suscripciones | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.play_station | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.play_station_suscripciones | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.minecraft | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.rixty | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.payCash | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.total | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="5">Total</td>
+            <td>{{total_saldo_davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td>{{total_saldo_davivienda_pago_de_credito | currency:'$'}}</td>
+            <td>{{total_saldo_davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td>{{total_saldo_davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td>{{total_saldo_aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td>{{total_saldo_aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td>{{total_saldo_aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td>{{total_saldo_aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td>{{total_saldo_aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td>{{total_saldo_xbox_plata | currency:'$'}}</td>
+            <td>{{total_saldo_imvu | currency:'$'}}</td>
+            <td>{{total_saldo_keo | currency:'$'}}</td>
+            <td>{{total_saldo_sisteCredito | currency:'$'}}</td>
+            <td>{{total_saldo_claro | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_claro | currency:'$'}}</td>
+            <td>{{total_saldo_sura | currency:'$'}}</td>
+            <td>{{total_saldo_movistar | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_movistar | currency:'$'}}</td>
+            <td>{{total_saldo_tigo | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_tigo | currency:'$'}}</td>
+            <td>{{total_saldo_avantel | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_avantel | currency:'$'}}</td>
+            <td>{{total_saldo_virgin | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_virgin | currency:'$'}}</td>
+            <td>{{total_saldo_etb | currency:'$'}}</td>
+            <td>{{total_saldo_paquete_etb | currency:'$'}}</td>
+            <td>{{total_saldo_exito | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_exito | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_conectame | currency:'$'}}</td>
+            <td>{{total_saldo_flashMobile | currency:'$'}}</td>
+            <td>{{total_saldo_direcTv | currency:'$'}}</td>
+            <td>{{total_saldo_wom | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_wom | currency:'$'}}</td>
+            <td>{{total_saldo_kalley_mobile | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_kalley_mobile | currency:'$'}}</td>
+            <td>{{total_saldo_wings_mobile | currency:'$'}}</td>
+            <td>{{total_saldo_paquetes_wings_mobile | currency:'$'}}</td>
+            <td>{{total_saldo_unicorn | currency:'$'}}</td>
+            <td>{{total_saldo_wplay | currency:'$'}}</td>
+            <td>{{total_saldo_mega_apuesta | currency:'$'}}</td>
+            <td>{{total_saldo_ya_juego | currency:'$'}}</td>
+            <td>{{total_saldo_aqui_juego | currency:'$'}}</td>
+            <td>{{total_saldo_rushBet | currency:'$'}}</td>
+            <td>{{total_saldo_rivalo | currency:'$'}}</td>
+            <td>{{total_saldo_miJugada | currency:'$'}}</td>
+            <td>{{total_saldo_facturas_otros | currency:'$'}}</td>
+            <td>{{total_saldo_facturas_de_gas_energia | currency:'$'}}</td>
+            <td>{{total_saldo_sms | currency:'$'}}</td>
+            <td>{{total_saldo_baloto | currency:'$'}}</td>
+            <td>{{total_saldo_baloto_pago_de_premios | currency:'$'}}</td>
+            <td>{{total_saldo_certificado_de_tradicion | currency:'$'}}</td>
+            <td>{{total_saldo_runt | currency:'$'}}</td>
+            <td>{{total_saldo_energia_prepago_essa | currency:'$'}}</td>
+            <td>{{total_saldo_energia_Prepago_epm | currency:'$'}}</td>
+            <td>{{total_saldo_soat_moto_estado | currency:'$'}}</td>
+            <td>{{total_saldo_soat_carro_estado | currency:'$'}}</td>
+            <td>{{total_saldo_soat_bus_estado | currency:'$'}}</td>
+            <td>{{total_saldo_axa_soat_moto | currency:'$'}}</td>
+            <td>{{total_saldo_axa_soat_carro | currency:'$'}}</td>
+            <td>{{total_saldo_axa_soat_publico | currency:'$'}}</td>
+            <td>{{total_saldo_movii_recargas | currency:'$'}}</td>
+            <td>{{total_saldo_movii_retiros | currency:'$'}}</td>
+            <td>{{total_saldo_daviplata_recargas | currency:'$'}}</td>
+            <td>{{total_saldo_daviplata_retiros | currency:'$'}}</td>
+            <td>{{total_saldo_taxia_recargas | currency:'$'}}</td>
+            <td>{{total_saldo_tpaga_retiros | currency:'$'}}</td>
+            <td>{{total_saldo_razer_gold | currency:'$'}}</td>
+            <td>{{total_saldo_netflix | currency:'$'}}</td>
+            <td>{{total_saldo_spotify | currency:'$'}}</td>
+            <td>{{total_saldo_payValida | currency:'$'}}</td>
+            <td>{{total_saldo_freeFire | currency:'$'}}</td>
+            <td>{{total_saldo_noggin | currency:'$'}}</td>
+            <td>{{total_saldo_crunchyroll | currency:'$'}}</td>
+            <td>{{total_saldo_office | currency:'$'}}</td>
+            <td>{{total_saldo_win_sport | currency:'$'}}</td>
+            <td>{{total_saldo_dataCredito | currency:'$'}}</td>
+            <td>{{total_saldo_paramount | currency:'$'}}</td>
+            <td>{{total_saldo_xbox_suscripciones | currency:'$'}}</td>
+            <td>{{total_saldo_play_station | currency:'$'}}</td>
+            <td>{{total_saldo_play_station_suscripciones | currency:'$'}}</td>
+            <td>{{total_saldo_minecraft | currency:'$'}}</td>
+            <td>{{total_saldo_rixty | currency:'$'}}</td>
+            <td>{{total_saldo_payCash | currency:'$'}}</td>
+            <td>{{total_saldo_total | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="5">Promedio</td>
+            <td>{{promedio_saldos_davivienda_pago_tarjeta_de_credito | currency:'$'}}</td>
+            <td>{{promedio_saldos_davivienda_pago_de_credito | currency:'$'}}</td>
+            <td>{{promedio_saldos_davivienda_deposito_davivienda | currency:'$'}}</td>
+            <td>{{promedio_saldos_davivienda_retiro_davivienda | currency:'$'}}</td>
+            <td>{{promedio_saldos_aval_tarjeta_de_credito_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_saldos_aval_cred_rotativo_crediservices_dinero_extra_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_saldos_aval_credito_hipotecario_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_saldos_aval_otros_creditos_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_saldos_aval_credito_motos_vehiculos_ban_bogota | currency:'$'}}</td>
+            <td>{{promedio_saldos_xbox_plata | currency:'$'}}</td>
+            <td>{{promedio_saldos_imvu | currency:'$'}}</td>
+            <td>{{promedio_saldos_keo | currency:'$'}}</td>
+            <td>{{promedio_saldos_sisteCredito | currency:'$'}}</td>
+            <td>{{promedio_saldos_claro | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_claro | currency:'$'}}</td>
+            <td>{{promedio_saldos_sura | currency:'$'}}</td>
+            <td>{{promedio_saldos_movistar | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_movistar | currency:'$'}}</td>
+            <td>{{promedio_saldos_tigo | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_tigo | currency:'$'}}</td>
+            <td>{{promedio_saldos_avantel | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_avantel | currency:'$'}}</td>
+            <td>{{promedio_saldos_virgin | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_virgin | currency:'$'}}</td>
+            <td>{{promedio_saldos_etb | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquete_etb | currency:'$'}}</td>
+            <td>{{promedio_saldos_exito | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_exito | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_conectame | currency:'$'}}</td>
+            <td>{{promedio_saldos_flashMobile | currency:'$'}}</td>
+            <td>{{promedio_saldos_direcTv | currency:'$'}}</td>
+            <td>{{promedio_saldos_wom | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_wom | currency:'$'}}</td>
+            <td>{{promedio_saldos_kalley_mobile | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_kalley_mobile | currency:'$'}}</td>
+            <td>{{promedio_saldos_wings_mobile | currency:'$'}}</td>
+            <td>{{promedio_saldos_paquetes_wings_mobile | currency:'$'}}</td>
+            <td>{{promedio_saldos_unicorn | currency:'$'}}</td>
+            <td>{{promedio_saldos_wplay | currency:'$'}}</td>
+            <td>{{promedio_saldos_mega_apuesta | currency:'$'}}</td>
+            <td>{{promedio_saldos_ya_juego | currency:'$'}}</td>
+            <td>{{promedio_saldos_aqui_juego | currency:'$'}}</td>
+            <td>{{promedio_saldos_rushBet | currency:'$'}}</td>
+            <td>{{promedio_saldos_rivalo | currency:'$'}}</td>
+            <td>{{promedio_saldos_miJugada | currency:'$'}}</td>
+            <td>{{promedio_saldos_facturas_otros | currency:'$'}}</td>
+            <td>{{promedio_saldos_facturas_de_gas_energia | currency:'$'}}</td>
+            <td>{{promedio_saldos_sms | currency:'$'}}</td>
+            <td>{{promedio_saldos_baloto | currency:'$'}}</td>
+            <td>{{promedio_saldos_baloto_pago_de_premios | currency:'$'}}</td>
+            <td>{{promedio_saldos_certificado_de_tradicion | currency:'$'}}</td>
+            <td>{{promedio_saldos_runt | currency:'$'}}</td>
+            <td>{{promedio_saldos_energia_prepago_essa | currency:'$'}}</td>
+            <td>{{promedio_saldos_energia_Prepago_epm | currency:'$'}}</td>
+            <td>{{promedio_saldos_soat_moto_estado | currency:'$'}}</td>
+            <td>{{promedio_saldos_soat_carro_estado | currency:'$'}}</td>
+            <td>{{promedio_saldos_soat_bus_estado | currency:'$'}}</td>
+            <td>{{promedio_saldos_axa_soat_moto | currency:'$'}}</td>
+            <td>{{promedio_saldos_axa_soat_carro | currency:'$'}}</td>
+            <td>{{promedio_saldos_axa_soat_publico | currency:'$'}}</td>
+            <td>{{promedio_saldos_movii_recargas | currency:'$'}}</td>
+            <td>{{promedio_saldos_movii_retiros | currency:'$'}}</td>
+            <td>{{promedio_saldos_daviplata_recargas | currency:'$'}}</td>
+            <td>{{promedio_saldos_daviplata_retiros | currency:'$'}}</td>
+            <td>{{promedio_saldos_taxia_recargas | currency:'$'}}</td>
+            <td>{{promedio_saldos_tpaga_retiros | currency:'$'}}</td>
+            <td>{{promedio_saldos_razer_gold | currency:'$'}}</td>
+            <td>{{promedio_saldos_netflix | currency:'$'}}</td>
+            <td>{{promedio_saldos_spotify | currency:'$'}}</td>
+            <td>{{promedio_saldos_payValida | currency:'$'}}</td>
+            <td>{{promedio_saldos_freeFire | currency:'$'}}</td>
+            <td>{{promedio_saldos_noggin | currency:'$'}}</td>
+            <td>{{promedio_saldos_crunchyroll | currency:'$'}}</td>
+            <td>{{promedio_saldos_office | currency:'$'}}</td>
+            <td>{{promedio_saldos_win_sport | currency:'$'}}</td>
+            <td>{{promedio_saldos_dataCredito | currency:'$'}}</td>
+            <td>{{promedio_saldos_paramount | currency:'$'}}</td>
+            <td>{{promedio_saldos_xbox_suscripciones | currency:'$'}}</td>
+            <td>{{promedio_saldos_play_station | currency:'$'}}</td>
+            <td>{{promedio_saldos_play_station_suscripciones | currency:'$'}}</td>
+            <td>{{promedio_saldos_minecraft | currency:'$'}}</td>
+            <td>{{promedio_saldos_rixty | currency:'$'}}</td>
+            <td>{{promedio_saldos_payCash | currency:'$'}}</td>
+            <td>{{promedio_saldos_total | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="100">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

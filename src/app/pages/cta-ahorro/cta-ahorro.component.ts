@@ -4,7 +4,7 @@ import { Table } from 'primeng/table';
 import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
 import { EXA_Extracto_ahorro, EXA_Indicadores } from 'src/app/models/CtaAhorro';
-import { ExtractoAhorroService } from 'src/app/service/extracto-ahorro.service';
+import { ExtractoAhorroService } from 'src/app/service/servicesApp/extracto-ahorro.service';
 
 @Component({
     selector: 'app-cta-ahorro',

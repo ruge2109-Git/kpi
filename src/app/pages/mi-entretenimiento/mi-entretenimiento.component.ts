@@ -5,7 +5,7 @@ import readXlsxFile, { Row } from 'read-excel-file';
 import { Cell } from 'read-excel-file/types';
 import { lastValueFrom } from 'rxjs';
 import { MIEn_Indicadores, MiEn_Movimientos } from 'src/app/models/MiEntretenimiento';
-import { MiEntretenimientoService } from 'src/app/service/mi-entretenimiento.service';
+import { MiEntretenimientoService } from 'src/app/service/servicesApp/mi-entretenimiento.service';
 
 @Component({
     selector: 'app-mi-entretenimiento',
@@ -583,8 +583,8 @@ export class MiEntretenimientoComponent implements OnInit {
     }
 
     obtenerValor(valor: Cell) {
-        valor = valor.toString().replace(/\$|\,/g, '');
-        valor = valor.toString().replace('no registra', '0');
+        valor = valor+"".replace(/\$|\,/g, '');
+        valor = valor+"".replace('no registra', '0');
         return Number(valor);
     }
 

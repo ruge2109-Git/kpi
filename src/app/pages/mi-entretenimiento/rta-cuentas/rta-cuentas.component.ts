@@ -4,7 +4,7 @@ import { Table } from 'primeng/table';
 import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
 import { MIEn_Respuesta } from 'src/app/models/MiEntretenimiento';
-import { MiEntretenimientoService } from 'src/app/service/mi-entretenimiento.service';
+import { MiEntretenimientoService } from 'src/app/service/servicesApp/mi-entretenimiento.service';
 
 @Component({
     selector: 'app-rta-cuentas',

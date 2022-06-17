@@ -3,7 +3,7 @@ import { MessageService } from 'primeng/api';
 import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
 import { EX_Informe_reparto } from 'src/app/models/extractos';
-import { InformeRepartoService } from 'src/app/service/informe-reparto.service';
+import { InformeRepartoService } from 'src/app/service/servicesApp/informe-reparto.service';
 
 @Component({
     selector: 'app-extractos',

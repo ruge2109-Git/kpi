@@ -149,7 +149,8 @@ import { CtaAhorroComponent } from './pages/cta-ahorro/cta-ahorro.component';
 import { ExtractoRecargaComponent } from './pages/extracto-recarga/extracto-recarga.component';
 import { MiEntretenimientoComponent } from './pages/mi-entretenimiento/mi-entretenimiento.component';
 import { RtaCuentasComponent } from './pages/mi-entretenimiento/rta-cuentas/rta-cuentas.component';
-import { WebJVComponent } from './pages/web-jv/web-jv.component';
+import { ConsumidoComponent } from './pages/webJV/consumido/consumido.component';
+import { JVExtractoComponent } from './pages/webJV/jvextracto/jvextracto.component';
 @NgModule({
     imports: [
         BrowserModule,
@@ -290,7 +291,8 @@ import { WebJVComponent } from './pages/web-jv/web-jv.component';
         ExtractoRecargaComponent,
         MiEntretenimientoComponent,
         RtaCuentasComponent,
-        WebJVComponent,
+        ConsumidoComponent,
+        JVExtractoComponent,
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },

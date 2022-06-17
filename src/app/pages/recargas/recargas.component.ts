@@ -3,7 +3,7 @@ import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { lastValueFrom } from 'rxjs';
 import { Sales_report, SR_Cliente_Canal, SR_Cliente_Operador, SR_Indicador, SR_Producto, SR_top_canal, SR_top_cliente, SR_top_operador } from 'src/app/models/recargas';
-import { RecargasService } from 'src/app/service/recargas.service';
+import { RecargasService } from 'src/app/service/servicesApp/recargas.service';
 
 @Component({
     selector: 'app-recargas',

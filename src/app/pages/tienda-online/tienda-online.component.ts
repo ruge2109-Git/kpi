@@ -4,7 +4,7 @@ import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { TiendaOnline, TO_comisiones, TO_ComprasPorPersona, TO_DetalleRecarga, TO_IndicadoresGenerales, TO_PersonasMasVentas, TO_Producto, TO_ProductosMasVendidos, TO_Recargas } from 'src/app/models/tienda-online';
 import readXlsxFile from 'read-excel-file';
 import { Table } from 'primeng/table';
-import { TiendaOnlineService } from 'src/app/service/tienda-online.service';
+import { TiendaOnlineService } from 'src/app/service/servicesApp/tienda-online.service';
 import { lastValueFrom } from 'rxjs';
 
 @Component({

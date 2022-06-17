@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { MiEn_Movimientos, MIEn_Respuesta } from '../models/MiEntretenimiento';
+import { MiEn_Movimientos, MIEn_Respuesta } from '../../models/MiEntretenimiento';
 
 @Injectable({
   providedIn: 'root'

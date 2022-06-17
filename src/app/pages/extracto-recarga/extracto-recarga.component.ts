@@ -4,7 +4,7 @@ import { Table } from 'primeng/table';
 import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
 import { EXR_Extracto_recargas, EXR_Indicadores } from 'src/app/models/Ext_recarga';
-import { ExtrctoRecargasService } from 'src/app/service/extrcto-recargas.service';
+import { ExtrctoRecargasService } from 'src/app/service/servicesApp/extrcto-recargas.service';
 
 @Component({
     selector: 'app-extracto-recarga',
