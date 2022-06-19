@@ -18,7 +18,7 @@
   <div class="col-12 md:col-6">
     <div class="card">
       <h5>Seleccione los archivos - Recargas</h5>
-      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event,'recargas')" multiple="multiple" accept=".xlsx" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
+      <p-fileUpload name="myfile[]" customUpload="true" (uploadHandler)="onUpload($event,'recargas')" multiple="multiple" accept=".csv" maxFileSize="1000000" chooseLabel="Agregar" uploadLabel="Cargar" cancelLabel="Cancelar">
       </p-fileUpload>
       <div class="mt-4" *ngIf="showProgressBarRecargas">
         <h5>Barra de progreso</h5>
@@ -42,85 +42,85 @@
 </div>
 
 <div class="grid">
-    <div class="col-12">
-      <div class="card">
-        <h5>Indicadores</h5>
-        <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroIndicadores($event)">
-          <ng-template pTemplate="caption">
-            <div class="flex justify-content-between flex-column sm:flex-row">
-              <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIndicadores)"></button>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="header">
-            <tr>
-              <th pSortableColumn="fecha_cargue">Fecha
-                <p-sortIcon field="fecha_cargue"></p-sortIcon>
-              </th>
-              <th pSortableColumn="ganancias">Ganancias
-                <p-sortIcon field="ganancias"></p-sortIcon>
-              </th>
-              <th pSortableColumn="saldos">Saldos
-                <p-sortIcon field="saldos"></p-sortIcon>
-              </th>
-              <th pSortableColumn="recargas">Recargas
-                <p-sortIcon field="recargas"></p-sortIcon>
-              </th>
+  <div class="col-12">
+    <div class="card">
+      <h5>Indicadores</h5>
+      <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinIndicadores" #tableIndicadores [value]="listIndicadores" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroIndicadores($event)">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableIndicadores)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha_cargue">Fecha
+              <p-sortIcon field="fecha_cargue"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ganancias">Ganancias
+              <p-sortIcon field="ganancias"></p-sortIcon>
+            </th>
+            <th pSortableColumn="saldos">Saldos
+              <p-sortIcon field="saldos"></p-sortIcon>
+            </th>
+            <th pSortableColumn="recargas">Recargas
+              <p-sortIcon field="recargas"></p-sortIcon>
+            </th>
 
-            </tr>
-            <tr>
-              <th>
-                <div class="flex justify-content-between flex-column sm:flex-row">
-                  <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasIndicadores"></p-calendar>
-                  <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getIndicadoresFechas()"></button>
-                </div>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="ganancias"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="saldos"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="recargas"></p-columnFilter>
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-data>
-            <tr>
-              <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
-              <td style="min-width: 12rem;">{{data.ganancias | currency:'$' }}</td>
-              <td style="min-width: 12rem;">{{data.saldos | currency:'$'}}</td>
-              <td style="min-width: 12rem;">{{data.recargas | currency:'$'}}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr>
-              <td>Total</td>
-              <td>{{totalGanancias | currency:'$'}}</td>
-              <td>{{totalSaldos | currency:'$'}}</td>
-              <td>{{totalRecargas | currency:'$'}}</td>
-            </tr>
-            <tr>
-              <td>Promedio</td>
-              <td>{{promedioGanancias | currency:'$'}}</td>
-              <td>{{promedioSaldos | currency:'$'}}</td>
-              <td>{{promedioRecargas | currency:'$'}}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="100">Sin registros</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="loadingbody">
-            <tr>
-              <td colspan="100">Cargando información, por favor espere</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasIndicadores"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getIndicadoresFechas()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="ganancias"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="saldos"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="recargas"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
+            <td style="min-width: 12rem;">{{data.ganancias | currency:'$' }}</td>
+            <td style="min-width: 12rem;">{{data.saldos | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.recargas | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td>Total</td>
+            <td>{{totalGanancias | currency:'$'}}</td>
+            <td>{{totalSaldos | currency:'$'}}</td>
+            <td>{{totalRecargas | currency:'$'}}</td>
+          </tr>
+          <tr>
+            <td>Promedio</td>
+            <td>{{promedioGanancias | currency:'$'}}</td>
+            <td>{{promedioSaldos | currency:'$'}}</td>
+            <td>{{promedioRecargas | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="100">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
   </div>
+</div>
 
 
 <div class="grid">
@@ -1785,6 +1785,339 @@
             <td>{{promedio_saldos_payCash | currency:'$'}}</td>
             <td>{{promedio_saldos_total | currency:'$'}}</td>
           </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100">Sin registros</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="100">Cargando información, por favor espere</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h5>Recargas</h5>
+      <p-table [responsive]="true" responsiveLayout="scroll" [loading]="spinRecargas" #tableRecargas [value]="listRecargas" dataKey="code" [rows]="5" [paginator]="true" (onFilter)="filtroRecargas($event)">
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <button pButton label="Borrar filtros" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(tableRecargas)"></button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fecha_cargue">fecha_cargue
+              <p-sortIcon field="fecha_cargue"></p-sortIcon>
+            </th>
+            <th pSortableColumn="nombre">nombre
+              <p-sortIcon field="nombre"></p-sortIcon>
+            </th>
+            <th pSortableColumn="codigo_cliente">codigo_cliente
+              <p-sortIcon field="codigo_cliente"></p-sortIcon>
+            </th>
+            <th pSortableColumn="cc">cc
+              <p-sortIcon field="cc"></p-sortIcon>
+            </th>
+            <th pSortableColumn="perfil">perfil
+              <p-sortIcon field="perfil"></p-sortIcon>
+            </th>
+            <th pSortableColumn="comision">comision
+              <p-sortIcon field="comision"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ayudas_a_familias">ayudas_a_familias
+              <p-sortIcon field="ayudas_a_familias"></p-sortIcon>
+            </th>
+            <th pSortableColumn="claro">claro
+              <p-sortIcon field="claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_claro">paquetes_claro
+              <p-sortIcon field="paquetes_claro"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_movistar">paquetes_movistar
+              <p-sortIcon field="paquetes_movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="movistar">movistar
+              <p-sortIcon field="movistar"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_tigo">paquetes_tigo
+              <p-sortIcon field="paquetes_tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tigo">tigo
+              <p-sortIcon field="tigo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="avantel">avantel
+              <p-sortIcon field="avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_avantel">paquetes_avantel
+              <p-sortIcon field="paquetes_avantel"></p-sortIcon>
+            </th>
+            <th pSortableColumn="virgin">virgin
+              <p-sortIcon field="virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_virgin">paquetes_virgin
+              <p-sortIcon field="paquetes_virgin"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquete_etb">paquete_etb
+              <p-sortIcon field="paquete_etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="etb">etb
+              <p-sortIcon field="etb"></p-sortIcon>
+            </th>
+            <th pSortableColumn="exito">exito
+              <p-sortIcon field="exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_exito">paquetes_exito
+              <p-sortIcon field="paquetes_exito"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_conectame">paquetes_conectame
+              <p-sortIcon field="paquetes_conectame"></p-sortIcon>
+            </th>
+            <th pSortableColumn="conectame">conectame
+              <p-sortIcon field="conectame"></p-sortIcon>
+            </th>
+            <th pSortableColumn="sipmobile">sipmobile
+              <p-sortIcon field="sipmobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="flashmobile">flashmobile
+              <p-sortIcon field="flashmobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="directv">directv
+              <p-sortIcon field="directv"></p-sortIcon>
+            </th>
+            <th pSortableColumn="iyo_movil">iyo_movil
+              <p-sortIcon field="iyo_movil"></p-sortIcon>
+            </th>
+            <th pSortableColumn="comunicamos">comunicamos
+              <p-sortIcon field="comunicamos"></p-sortIcon>
+            </th>
+            <th pSortableColumn="wom">wom
+              <p-sortIcon field="wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_wom">paquetes_wom
+              <p-sortIcon field="paquetes_wom"></p-sortIcon>
+            </th>
+            <th pSortableColumn="kalley_mobile">kalley_mobile
+              <p-sortIcon field="kalley_mobile"></p-sortIcon>
+            </th>
+            <th pSortableColumn="paquetes_kalley">paquetes_kalley
+              <p-sortIcon field="paquetes_kalley"></p-sortIcon>
+            </th>
+            <th pSortableColumn="total">total
+              <p-sortIcon field="total"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <div class="flex justify-content-between flex-column sm:flex-row">
+                <p-calendar selectionMode="range" [showIcon]="true" [readonlyInput]="true" inputId="range" [touchUI]="true" placeholder="Rango de fechas" [(ngModel)]="rangoFechasRecargas"></p-calendar>
+                <button type="button" pButton pRipple icon="pi pi-search" class="ml-2" (click)="getRecargasFechas()"></button>
+              </div>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="nombre"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="codigo_cliente"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="cc"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="perfil"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="comision"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="ayudas_a_familias"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_claro"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="movistar"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="tigo"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_avantel"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_virgin"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquete_etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="etb"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_exito"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_conectame"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="conectame"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="sipmobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="flashmobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="directv"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="iyo_movil"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="comunicamos"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_wom"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="kalley_mobile"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="paquetes_kalley"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="total"></p-columnFilter>
+            </th>
+
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data>
+          <tr>
+            <td style="min-width: 12rem;">{{data.fecha_cargue | date:'dd-MM-yyyy'}}</td>
+            <td style="min-width: 12rem;">{{data.nombre}}</td>
+            <td style="min-width: 12rem;">{{data.codigo_cliente}}</td>
+            <td style="min-width: 12rem;">{{data.cc}}</td>
+            <td style="min-width: 12rem;">{{data.perfil}}</td>
+            <td style="min-width: 12rem;">{{data.comision}}</td>
+            <td style="min-width: 12rem;">{{data.ayudas_a_familias | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_claro | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.movistar | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.tigo | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_avantel | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_virgin | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquete_etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.etb | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_exito | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_conectame | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.conectame | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.sipmobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.flashmobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.directv | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.iyo_movil | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.comunicamos | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_wom | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.kalley_mobile | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.paquetes_kalley | currency:'$'}}</td>
+            <td style="min-width: 12rem;">{{data.total | currency:'$'}}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="6">Total</td>
+            <td>{{total_recargas_ayudas_a_familias | currency : '$'}}</td>
+            <td>{{total_recargas_claro | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_claro | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_movistar | currency : '$'}}</td>
+            <td>{{total_recargas_movistar | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_tigo | currency : '$'}}</td>
+            <td>{{total_recargas_tigo | currency : '$'}}</td>
+            <td>{{total_recargas_avantel | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_avantel | currency : '$'}}</td>
+            <td>{{total_recargas_virgin | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_virgin | currency : '$'}}</td>
+            <td>{{total_recargas_paquete_etb | currency : '$'}}</td>
+            <td>{{total_recargas_etb | currency : '$'}}</td>
+            <td>{{total_recargas_exito | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_exito | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_conectame | currency : '$'}}</td>
+            <td>{{total_recargas_conectame | currency : '$'}}</td>
+            <td>{{total_recargas_sipmobile | currency : '$'}}</td>
+            <td>{{total_recargas_flashmobile | currency : '$'}}</td>
+            <td>{{total_recargas_directv | currency : '$'}}</td>
+            <td>{{total_recargas_iyo_movil | currency : '$'}}</td>
+            <td>{{total_recargas_comunicamos | currency : '$'}}</td>
+            <td>{{total_recargas_wom | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_wom | currency : '$'}}</td>
+            <td>{{total_recargas_kalley_mobile | currency : '$'}}</td>
+            <td>{{total_recargas_paquetes_kalley | currency : '$'}}</td>
+            <td>{{total_recargas_total | currency : '$'}}</td>
+          </tr>
+          <tr>
+            <td colspan="6">Promedio</td>
+            <td>{{promedio_total_recargas_ayudas_a_familias | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_claro | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_claro | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_movistar | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_movistar | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_tigo | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_tigo | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_avantel | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_avantel | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_virgin | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_virgin | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquete_etb | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_etb | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_exito | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_exito | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_conectame | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_conectame | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_sipmobile | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_flashmobile | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_directv | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_iyo_movil | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_comunicamos | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_wom | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_wom | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_kalley_mobile | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_paquetes_kalley | currency : '$'}}</td>
+            <td>{{promedio_total_recargas_total | currency : '$'}}</td>
+          </tr>
+
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>

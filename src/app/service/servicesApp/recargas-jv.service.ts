@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { JV_Consumido_Ganancias, JV_Consumido_Saldo } from 'src/app/models/RecargasJV';
+import { JV_Consumido_Ganancias, JV_Consumido_Recargas, JV_Consumido_Saldo } from 'src/app/models/RecargasJV';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -32,15 +32,29 @@ export class RecargasJVService {
         return this.http.get(`${this.url}/recargasJV/saldosFecha/${fechaInicio}/${fechaFin}`);
     }
 
+
+    nuevoSaldo(data: JV_Consumido_Saldo) {
+        return this.http.post(`${this.url}/recargasJV/nuevoSaldo`, data);
+    }
+
+    getRecargas() {
+        return this.http.get(`${this.url}/recargasJV/recargas`);
+    }
+
+    getRecargasFecha(fechaInicio: string, fechaFin: string) {
+        return this.http.get(`${this.url}/recargasJV/recargasFecha/${fechaInicio}/${fechaFin}`);
+    }
+
+    nuevaRecarga(data: JV_Consumido_Recargas) {
+        return this.http.post(`${this.url}/recargasJV/nuevaRecarga`, data);
+    }
+
+
     getIndicadores() {
         return this.http.get(`${this.url}/recargasJV/indicadores`);
     }
 
     getIndicadoresFecha(fechaInicio: string, fechaFin: string) {
         return this.http.get(`${this.url}/recargasJV/indicadoresFecha/${fechaInicio}/${fechaFin}`);
-    }
-
-    nuevoSaldo(data: JV_Consumido_Saldo) {
-        return this.http.post(`${this.url}/recargasJV/nuevoSaldo`, data);
     }
 }

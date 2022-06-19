@@ -3,7 +3,7 @@ import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import readXlsxFile from 'read-excel-file';
 import { lastValueFrom } from 'rxjs';
-import { JV_Consumido_Ganancias, JV_Consumido_Indicadores, JV_Consumido_Saldo } from 'src/app/models/RecargasJV';
+import { JV_Consumido_Ganancias, JV_Consumido_Indicadores, JV_Consumido_Recargas, JV_Consumido_Saldo } from 'src/app/models/RecargasJV';
 import { RecargasJVService } from 'src/app/service/servicesApp/recargas-jv.service';
 
 @Component({
@@ -16,10 +16,12 @@ export class ConsumidoComponent implements OnInit {
     //ListUploadFiles
     listNewGanancias: JV_Consumido_Ganancias[] = [];
     listNewSaldo: JV_Consumido_Saldo[] = [];
+    listNewRecargas: JV_Consumido_Recargas[] = [];
 
     //listData
     listGanancias: JV_Consumido_Ganancias[] = [];
     listSaldo: JV_Consumido_Saldo[] = [];
+    listRecargas: JV_Consumido_Recargas[] = [];
 
     //List indicadores
     listIndicadores: JV_Consumido_Indicadores[] = [];
@@ -27,6 +29,7 @@ export class ConsumidoComponent implements OnInit {
     //Archivos
     uploadedFilesGanancias: any[] = [];
     uploadedFilesSaldo: any[] = [];
+    uploadedFilesRecargas: any[] = [];
 
     //Progress
     showProgressBarGanancias: boolean = false;
@@ -48,11 +51,13 @@ export class ConsumidoComponent implements OnInit {
     @ViewChild('tableIndicadores') tableIndicadores: Table;
     @ViewChild('tableGanancias') tableGanancias: Table;
     @ViewChild('tableSaldos') tableSaldos: Table;
+    @ViewChild('tableRecargas') tableRecargas: Table;
 
     //Fechas
     rangoFechasIndicadores: Date[] = [];
     rangoFechasGanancias: Date[] = [];
     rangoFechasSaldos: Date[] = [];
+    rangoFechasRecargas: Date[] = [];
 
     //Total indicadores
     public totalGanancias: number = 0;
@@ -408,6 +413,64 @@ export class ConsumidoComponent implements OnInit {
     public promedio_saldos_payCash: number = 0;
     public promedio_saldos_total: number = 0;
 
+    //TOtal recargas
+    public total_recargas_ayudas_a_familias: number = 0;
+    public total_recargas_claro: number = 0;
+    public total_recargas_paquetes_claro: number = 0;
+    public total_recargas_paquetes_movistar: number = 0;
+    public total_recargas_movistar: number = 0;
+    public total_recargas_paquetes_tigo: number = 0;
+    public total_recargas_tigo: number = 0;
+    public total_recargas_avantel: number = 0;
+    public total_recargas_paquetes_avantel: number = 0;
+    public total_recargas_virgin: number = 0;
+    public total_recargas_paquetes_virgin: number = 0;
+    public total_recargas_paquete_etb: number = 0;
+    public total_recargas_etb: number = 0;
+    public total_recargas_exito: number = 0;
+    public total_recargas_paquetes_exito: number = 0;
+    public total_recargas_paquetes_conectame: number = 0;
+    public total_recargas_conectame: number = 0;
+    public total_recargas_sipmobile: number = 0;
+    public total_recargas_flashmobile: number = 0;
+    public total_recargas_directv: number = 0;
+    public total_recargas_iyo_movil: number = 0;
+    public total_recargas_comunicamos: number = 0;
+    public total_recargas_wom: number = 0;
+    public total_recargas_paquetes_wom: number = 0;
+    public total_recargas_kalley_mobile: number = 0;
+    public total_recargas_paquetes_kalley: number = 0;
+    public total_recargas_total: number = 0;
+
+    //Promedio recargas
+    public promedio_total_recargas_ayudas_a_familias: number = 0;
+    public promedio_total_recargas_claro: number = 0;
+    public promedio_total_recargas_paquetes_claro: number = 0;
+    public promedio_total_recargas_paquetes_movistar: number = 0;
+    public promedio_total_recargas_movistar: number = 0;
+    public promedio_total_recargas_paquetes_tigo: number = 0;
+    public promedio_total_recargas_tigo: number = 0;
+    public promedio_total_recargas_avantel: number = 0;
+    public promedio_total_recargas_paquetes_avantel: number = 0;
+    public promedio_total_recargas_virgin: number = 0;
+    public promedio_total_recargas_paquetes_virgin: number = 0;
+    public promedio_total_recargas_paquete_etb: number = 0;
+    public promedio_total_recargas_etb: number = 0;
+    public promedio_total_recargas_exito: number = 0;
+    public promedio_total_recargas_paquetes_exito: number = 0;
+    public promedio_total_recargas_paquetes_conectame: number = 0;
+    public promedio_total_recargas_conectame: number = 0;
+    public promedio_total_recargas_sipmobile: number = 0;
+    public promedio_total_recargas_flashmobile: number = 0;
+    public promedio_total_recargas_directv: number = 0;
+    public promedio_total_recargas_iyo_movil: number = 0;
+    public promedio_total_recargas_comunicamos: number = 0;
+    public promedio_total_recargas_wom: number = 0;
+    public promedio_total_recargas_paquetes_wom: number = 0;
+    public promedio_total_recargas_kalley_mobile: number = 0;
+    public promedio_total_recargas_paquetes_kalley: number = 0;
+    public promedio_total_recargas_total: number = 0;
+
 
     constructor(private messageService: MessageService, private _recargasJVService: RecargasJVService) { }
 
@@ -615,7 +678,41 @@ export class ConsumidoComponent implements OnInit {
     }
 
     getRecargas() {
-
+        this.spinRecargas = true;
+        this.listRecargas = [];
+        this._recargasJVService.getRecargas().subscribe((data: any) => {
+            this.spinRecargas = false;
+            if (!data.bRta) return;
+            this.listRecargas = data.data;
+            this.listRecargas.forEach(element => {
+                element.ayudas_a_familias = Number(element.ayudas_a_familias);
+                element.claro = Number(element.claro);
+                element.paquetes_claro = Number(element.paquetes_claro);
+                element.paquetes_movistar = Number(element.paquetes_movistar);
+                element.movistar = Number(element.movistar);
+                element.paquetes_tigo = Number(element.paquetes_tigo);
+                element.tigo = Number(element.tigo);
+                element.avantel = Number(element.avantel);
+                element.paquetes_avantel = Number(element.paquetes_avantel);
+                element.virgin = Number(element.virgin);
+                element.paquetes_virgin = Number(element.paquetes_virgin);
+                element.paquete_etb = Number(element.paquete_etb);
+                element.etb = Number(element.etb);
+                element.exito = Number(element.exito);
+                element.paquetes_exito = Number(element.paquetes_exito);
+                element.paquetes_conectame = Number(element.paquetes_conectame);
+                element.conectame = Number(element.conectame);
+                element.sipmobile = Number(element.sipmobile);
+                element.flashmobile = Number(element.flashmobile);
+                element.directv = Number(element.directv);
+                element.iyo_movil = Number(element.iyo_movil);
+                element.comunicamos = Number(element.comunicamos);
+                element.wom = Number(element.wom);
+                element.paquetes_wom = Number(element.paquetes_wom);
+                element.kalley_mobile = Number(element.kalley_mobile);
+                element.paquetes_kalley = Number(element.paquetes_kalley);
+            });
+        })
     }
 
     getIndicadores() {
@@ -643,7 +740,7 @@ export class ConsumidoComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.spinGanancias = true;
         this.listGanancias = [];
-        this._recargasJVService.getGananciasFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this._recargasJVService.getGananciasFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinGanancias = false;
             if (!data.bRta) return;
             this.listGanancias = data.data;
@@ -745,7 +842,7 @@ export class ConsumidoComponent implements OnInit {
         if (fechaFinal == null) fechaFinal = fechaInicial;
         this.spinSaldo = true;
         this.listSaldo = [];
-        this._recargasJVService.getSaldosFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this._recargasJVService.getSaldosFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinSaldo = false;
             if (!data.bRta) return;
             this.listSaldo = data.data;
@@ -839,7 +936,47 @@ export class ConsumidoComponent implements OnInit {
     }
 
     getRecargasFechas() {
-
+        let fechaInicial = this.rangoFechasRecargas[0] != null ? this.formatDate(this.rangoFechasRecargas[0]) : null;
+        let fechaFinal = this.rangoFechasRecargas[1] != null ? this.formatDate(this.rangoFechasRecargas[1]) : null;
+        if (fechaInicial == null) {
+            return;
+        };
+        if (fechaFinal == null) fechaFinal = fechaInicial;
+        this.spinRecargas = true;
+        this.listRecargas = [];
+        this._recargasJVService.getRecargasFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
+            this.spinRecargas = false;
+            if (!data.bRta) return;
+            this.listRecargas = data.data;
+            this.listRecargas.forEach(element => {
+                element.ayudas_a_familias = Number(element.ayudas_a_familias);
+                element.claro = Number(element.claro);
+                element.paquetes_claro = Number(element.paquetes_claro);
+                element.paquetes_movistar = Number(element.paquetes_movistar);
+                element.movistar = Number(element.movistar);
+                element.paquetes_tigo = Number(element.paquetes_tigo);
+                element.tigo = Number(element.tigo);
+                element.avantel = Number(element.avantel);
+                element.paquetes_avantel = Number(element.paquetes_avantel);
+                element.virgin = Number(element.virgin);
+                element.paquetes_virgin = Number(element.paquetes_virgin);
+                element.paquete_etb = Number(element.paquete_etb);
+                element.etb = Number(element.etb);
+                element.exito = Number(element.exito);
+                element.paquetes_exito = Number(element.paquetes_exito);
+                element.paquetes_conectame = Number(element.paquetes_conectame);
+                element.conectame = Number(element.conectame);
+                element.sipmobile = Number(element.sipmobile);
+                element.flashmobile = Number(element.flashmobile);
+                element.directv = Number(element.directv);
+                element.iyo_movil = Number(element.iyo_movil);
+                element.comunicamos = Number(element.comunicamos);
+                element.wom = Number(element.wom);
+                element.paquetes_wom = Number(element.paquetes_wom);
+                element.kalley_mobile = Number(element.kalley_mobile);
+                element.paquetes_kalley = Number(element.paquetes_kalley);
+            });
+        })
     }
 
     getIndicadoresFechas() {
@@ -852,7 +989,7 @@ export class ConsumidoComponent implements OnInit {
 
         this.spinIndicadores = true;
         this.listIndicadores = [];
-        this._recargasJVService.getIndicadoresFecha(fechaInicial,fechaFinal).subscribe((data: any) => {
+        this._recargasJVService.getIndicadoresFecha(fechaInicial, fechaFinal).subscribe((data: any) => {
             this.spinIndicadores = false;
             if (!data.bRta) return;
             this.listIndicadores = data.data;
@@ -875,6 +1012,10 @@ export class ConsumidoComponent implements OnInit {
                 this.messageService.add({ severity: 'info', summary: 'Correcto', detail: 'Archivo procesado correctamente' });
                 break;
             case "recargas":
+                for (const file of event.files) {
+                    this.uploadedFilesRecargas.push(file);
+                }
+                this.readCsvRecargas();
                 this.messageService.add({ severity: 'info', summary: 'Correcto', detail: 'Archivo procesado correctamente' });
                 break;
             case "saldo":
@@ -889,7 +1030,6 @@ export class ConsumidoComponent implements OnInit {
                 break;
         }
         this.initData();
-        // await this.readExcel();
     }
 
     async readExcelGanancias() {
@@ -1139,6 +1279,122 @@ export class ConsumidoComponent implements OnInit {
         this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se ha terminado el cargue de recargas' });
         this.showProgressBarSaldo = false;
         this.initData();
+    }
+
+    async readCsvRecargas() {
+        for (const element of this.uploadedFilesRecargas) {
+            let reader = new FileReader();
+            reader.readAsText(element);
+            reader.onloadend = () => {
+                let csvData = reader.result;
+                let csvRecordsArray = (<string>csvData).split(/\r\n|\n/);
+                let headers = this.getHeaderCsvRecargas(csvRecordsArray, 0);
+                let headersNames = this.getHeaderCsvRecargas(csvRecordsArray, 1);
+                this.listNewRecargas = this.getDataCsvRecargas(csvRecordsArray, headersNames.length, headers[1]);
+
+            };
+        }
+        await this.timeout(200);
+        this.saveRecargas();
+    }
+
+    async saveRecargas() {
+        this.showProgressBarRecargas = true;
+        let dataSubir = this.listNewRecargas.length;
+        let contador = 1;
+        for (const recarga of this.listNewRecargas) {
+            await lastValueFrom(this._recargasJVService.nuevaRecarga(recarga)).then((data: any) => { });
+            this.valueProgressBarRecargas = Math.round((contador * 100) / dataSubir);
+            contador++;
+        }
+        this.messageService.add({ severity: 'success', summary: 'Correcto', detail: 'Se ha terminado el cargue de recargas' });
+        this.showProgressBarRecargas = false;
+        this.initData();
+    }
+
+    getHeaderCsvRecargas(csvRecordsArr: any, csvRow: number) {
+        let headers = (<string>csvRecordsArr[csvRow]).split(',');
+        let headerArray = [];
+        for (let j = 0; j < headers.length; j++) {
+            headerArray.push(headers[j]);
+        }
+        return headerArray;
+    }
+
+    getDataCsvRecargas(csvRecordsArray: any, headerLength: number, date: string) {
+        let csvArr = [];
+
+        for (let i = 2; i < csvRecordsArray.length; i++) {
+            let curruntRecord = (<string>csvRecordsArray[i]).split(',');
+            if (curruntRecord.length == headerLength) {
+                let csvRecord: JV_Consumido_Recargas = {
+                    fecha_cargue: date,
+                    nombre: curruntRecord[0].trim(),
+                    codigo_cliente: curruntRecord[1].trim(),
+                    cc: curruntRecord[2].trim(),
+                    perfil: curruntRecord[3].trim(),
+                    comision: curruntRecord[4].trim(),
+                    ayudas_a_familias: Number(curruntRecord[5].trim()),
+                    claro: Number(curruntRecord[6].trim()),
+                    paquetes_claro: Number(curruntRecord[7].trim()),
+                    paquetes_movistar: Number(curruntRecord[8].trim()),
+                    movistar: Number(curruntRecord[9].trim()),
+                    paquetes_tigo: Number(curruntRecord[10].trim()),
+                    tigo: Number(curruntRecord[11].trim()),
+                    avantel: Number(curruntRecord[12].trim()),
+                    paquetes_avantel: Number(curruntRecord[13].trim()),
+                    virgin: Number(curruntRecord[14].trim()),
+                    paquetes_virgin: Number(curruntRecord[15].trim()),
+                    paquete_etb: Number(curruntRecord[16].trim()),
+                    etb: Number(curruntRecord[17].trim()),
+                    exito: Number(curruntRecord[18].trim()),
+                    paquetes_exito: Number(curruntRecord[19].trim()),
+                    paquetes_conectame: Number(curruntRecord[20].trim()),
+                    conectame: Number(curruntRecord[21].trim()),
+                    sipmobile: Number(curruntRecord[22].trim()),
+                    flashmobile: Number(curruntRecord[23].trim()),
+                    directv: Number(curruntRecord[24].trim()),
+                    iyo_movil: Number(curruntRecord[25].trim()),
+                    comunicamos: Number(curruntRecord[26].trim()),
+                    wom: Number(curruntRecord[27].trim()),
+                    paquetes_wom: Number(curruntRecord[28].trim()),
+                    kalley_mobile: Number(curruntRecord[29].trim()),
+                    paquetes_kalley: Number(curruntRecord[30].trim()),
+                    total: Number(curruntRecord[5].trim()) +
+                        Number(curruntRecord[6].trim()) +
+                        Number(curruntRecord[7].trim()) +
+                        Number(curruntRecord[8].trim()) +
+                        Number(curruntRecord[9].trim()) +
+                        Number(curruntRecord[10].trim()) +
+                        Number(curruntRecord[11].trim()) +
+                        Number(curruntRecord[12].trim()) +
+                        Number(curruntRecord[13].trim()) +
+                        Number(curruntRecord[14].trim()) +
+                        Number(curruntRecord[15].trim()) +
+                        Number(curruntRecord[16].trim()) +
+                        Number(curruntRecord[17].trim()) +
+                        Number(curruntRecord[18].trim()) +
+                        Number(curruntRecord[19].trim()) +
+                        Number(curruntRecord[20].trim()) +
+                        Number(curruntRecord[21].trim()) +
+                        Number(curruntRecord[22].trim()) +
+                        Number(curruntRecord[23].trim()) +
+                        Number(curruntRecord[24].trim()) +
+                        Number(curruntRecord[25].trim()) +
+                        Number(curruntRecord[26].trim()) +
+                        Number(curruntRecord[27].trim()) +
+                        Number(curruntRecord[28].trim()) +
+                        Number(curruntRecord[29].trim()) +
+                        Number(curruntRecord[30].trim())
+                };
+                csvArr.push(csvRecord);
+            }
+        }
+        return csvArr;
+    }
+
+    timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     //Filtro Ganancias
@@ -1493,7 +1749,7 @@ export class ConsumidoComponent implements OnInit {
         this.promedio_total = this.total_total / (listaFechas.length == 0 ? 1 : listaFechas.length);
     }
 
-    //Filtro Ganancias
+    //Filtro saldos
     filtroSaldos(event) {
 
         this.total_saldo_davivienda_pago_tarjeta_de_credito = 0;
@@ -1845,6 +2101,129 @@ export class ConsumidoComponent implements OnInit {
         this.promedio_saldos_total = this.total_saldo_total / (listaFechas.length == 0 ? 1 : listaFechas.length);
     }
 
+    //Filtro recargas
+    filtroRecargas(event) {
+
+        this.total_recargas_ayudas_a_familias = 0;
+        this.total_recargas_claro = 0;
+        this.total_recargas_paquetes_claro = 0;
+        this.total_recargas_paquetes_movistar = 0;
+        this.total_recargas_movistar = 0;
+        this.total_recargas_paquetes_tigo = 0;
+        this.total_recargas_tigo = 0;
+        this.total_recargas_avantel = 0;
+        this.total_recargas_paquetes_avantel = 0;
+        this.total_recargas_virgin = 0;
+        this.total_recargas_paquetes_virgin = 0;
+        this.total_recargas_paquete_etb = 0;
+        this.total_recargas_etb = 0;
+        this.total_recargas_exito = 0;
+        this.total_recargas_paquetes_exito = 0;
+        this.total_recargas_paquetes_conectame = 0;
+        this.total_recargas_conectame = 0;
+        this.total_recargas_sipmobile = 0;
+        this.total_recargas_flashmobile = 0;
+        this.total_recargas_directv = 0;
+        this.total_recargas_iyo_movil = 0;
+        this.total_recargas_comunicamos = 0;
+        this.total_recargas_wom = 0;
+        this.total_recargas_paquetes_wom = 0;
+        this.total_recargas_kalley_mobile = 0;
+        this.total_recargas_paquetes_kalley = 0;
+        this.total_recargas_total = 0;
+
+
+        this.promedio_total_recargas_ayudas_a_familias = 0;
+        this.promedio_total_recargas_claro = 0;
+        this.promedio_total_recargas_paquetes_claro = 0;
+        this.promedio_total_recargas_paquetes_movistar = 0;
+        this.promedio_total_recargas_movistar = 0;
+        this.promedio_total_recargas_paquetes_tigo = 0;
+        this.promedio_total_recargas_tigo = 0;
+        this.promedio_total_recargas_avantel = 0;
+        this.promedio_total_recargas_paquetes_avantel = 0;
+        this.promedio_total_recargas_virgin = 0;
+        this.promedio_total_recargas_paquetes_virgin = 0;
+        this.promedio_total_recargas_paquete_etb = 0;
+        this.promedio_total_recargas_etb = 0;
+        this.promedio_total_recargas_exito = 0;
+        this.promedio_total_recargas_paquetes_exito = 0;
+        this.promedio_total_recargas_paquetes_conectame = 0;
+        this.promedio_total_recargas_conectame = 0;
+        this.promedio_total_recargas_sipmobile = 0;
+        this.promedio_total_recargas_flashmobile = 0;
+        this.promedio_total_recargas_directv = 0;
+        this.promedio_total_recargas_iyo_movil = 0;
+        this.promedio_total_recargas_comunicamos = 0;
+        this.promedio_total_recargas_wom = 0;
+        this.promedio_total_recargas_paquetes_wom = 0;
+        this.promedio_total_recargas_kalley_mobile = 0;
+        this.promedio_total_recargas_paquetes_kalley = 0;
+        this.promedio_total_recargas_total = 0;
+        let dataFiltrada = event.filteredValue;
+        let listaFechas = [];
+        dataFiltrada.forEach(element => {
+            this.total_recargas_ayudas_a_familias += Number(element.ayudas_a_familias);
+            this.total_recargas_claro += Number(element.claro);
+            this.total_recargas_paquetes_claro += Number(element.paquetes_claro);
+            this.total_recargas_paquetes_movistar += Number(element.paquetes_movistar);
+            this.total_recargas_movistar += Number(element.movistar);
+            this.total_recargas_paquetes_tigo += Number(element.paquetes_tigo);
+            this.total_recargas_tigo += Number(element.tigo);
+            this.total_recargas_avantel += Number(element.avantel);
+            this.total_recargas_paquetes_avantel += Number(element.paquetes_avantel);
+            this.total_recargas_virgin += Number(element.virgin);
+            this.total_recargas_paquetes_virgin += Number(element.paquetes_virgin);
+            this.total_recargas_paquete_etb += Number(element.paquete_etb);
+            this.total_recargas_etb += Number(element.etb);
+            this.total_recargas_exito += Number(element.exito);
+            this.total_recargas_paquetes_exito += Number(element.paquetes_exito);
+            this.total_recargas_paquetes_conectame += Number(element.paquetes_conectame);
+            this.total_recargas_conectame += Number(element.conectame);
+            this.total_recargas_sipmobile += Number(element.sipmobile);
+            this.total_recargas_flashmobile += Number(element.flashmobile);
+            this.total_recargas_directv += Number(element.directv);
+            this.total_recargas_iyo_movil += Number(element.iyo_movil);
+            this.total_recargas_comunicamos += Number(element.comunicamos);
+            this.total_recargas_wom += Number(element.wom);
+            this.total_recargas_paquetes_wom += Number(element.paquetes_wom);
+            this.total_recargas_kalley_mobile += Number(element.kalley_mobile);
+            this.total_recargas_paquetes_kalley += Number(element.paquetes_kalley);
+            this.total_recargas_total += Number(element.total);
+
+            if (!listaFechas.includes(element.fecha_cargue.toString().split(" ")[0])) {
+                listaFechas.push(element.fecha_cargue.toString().split(" ")[0]);
+            }
+        });
+        this.promedio_total_recargas_ayudas_a_familias = this.total_recargas_ayudas_a_familias / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_claro = this.total_recargas_claro / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_claro = this.total_recargas_paquetes_claro / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_movistar = this.total_recargas_paquetes_movistar / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_movistar = this.total_recargas_movistar / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_tigo = this.total_recargas_paquetes_tigo / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_tigo = this.total_recargas_tigo / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_avantel = this.total_recargas_avantel / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_avantel = this.total_recargas_paquetes_avantel / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_virgin = this.total_recargas_virgin / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_virgin = this.total_recargas_paquetes_virgin / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquete_etb = this.total_recargas_paquete_etb / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_etb = this.total_recargas_etb / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_exito = this.total_recargas_exito / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_exito = this.total_recargas_paquetes_exito / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_conectame = this.total_recargas_paquetes_conectame / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_conectame = this.total_recargas_conectame / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_sipmobile = this.total_recargas_sipmobile / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_flashmobile = this.total_recargas_flashmobile / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_directv = this.total_recargas_directv / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_iyo_movil = this.total_recargas_iyo_movil / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_comunicamos = this.total_recargas_comunicamos / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_wom = this.total_recargas_wom / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_wom = this.total_recargas_paquetes_wom / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_kalley_mobile = this.total_recargas_kalley_mobile / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_paquetes_kalley = this.total_recargas_paquetes_kalley / (listaFechas.length == 0 ? 1 : listaFechas.length);
+        this.promedio_total_recargas_total = this.total_recargas_total / (listaFechas.length == 0 ? 1 : listaFechas.length);
+    }
+
     //Filtro Ganancias
     filtroIndicadores(event) {
 
@@ -1889,6 +2268,10 @@ export class ConsumidoComponent implements OnInit {
             case this.tableSaldos:
                 this.getSaldos();
                 this.rangoFechasSaldos = [];
+                break;
+            case this.tableRecargas:
+                this.getRecargas();
+                this.rangoFechasRecargas = [];
                 break;
             default:
                 break;

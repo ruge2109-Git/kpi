@@ -190,3 +190,40 @@ export interface JV_Consumido_Saldo {
     payCash: number ;
     total: number
 }
+
+export interface JV_Consumido_Recargas {
+    cod_consumido_recargas?: number;
+    fecha_cargue: string;
+    nombre: string;
+    codigo_cliente: string;
+    cc: string;
+    perfil: string;
+    comision: string;
+    ayudas_a_familias: number;
+    claro: number;
+    paquetes_claro: number;
+    paquetes_movistar: number;
+    movistar: number;
+    paquetes_tigo: number;
+    tigo: number;
+    avantel: number;
+    paquetes_avantel: number;
+    virgin: number;
+    paquetes_virgin: number;
+    paquete_etb: number;
+    etb: number;
+    exito: number;
+    paquetes_exito: number;
+    paquetes_conectame: number;
+    conectame: number;
+    sipmobile: number;
+    flashmobile: number;
+    directv: number;
+    iyo_movil: number;
+    comunicamos: number;
+    wom: number;
+    paquetes_wom: number;
+    kalley_mobile: number;
+    paquetes_kalley: number;
+    total: number;
+}
